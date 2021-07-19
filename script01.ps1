@@ -79,7 +79,7 @@ New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
 
 New-Item -Path C:\CosmosMCW -ItemType directory
 $WebClient = New-Object System.Net.WebClient
-$WebClient.DownloadFile("https://github.com/Microsoft/MCW-Cosmos-DB-Real-Time-Advanced-Analytics/archive/master.zip","C:\CosmosMCW\MCW-Cosmos-DB-Real-Time-Advanced-Analytics-master.zip")
+$WebClient.DownloadFile("https://github.com/microsoft/MCW-Cosmos-DB-Real-Time-Advanced-Analytics/archive/refs/heads/main.zip","C:\CosmosMCW\MCW-Cosmos-DB-Real-Time-Advanced-Analytics-main.zip")
 #unziping folder                                        
 function Expand-ZIPFile($file, $destination)
 {
@@ -90,7 +90,7 @@ foreach($item in $zip.items())
 $shell.Namespace($destination).copyhere($item)
 }
 }
-Expand-ZIPFile -File "C:\CosmosMCW\MCW-Cosmos-DB-Real-Time-Advanced-Analytics-master.zip" -Destination "C:\CosmosMCW\"
+Expand-ZIPFile -File "C:\CosmosMCW\MCW-Cosmos-DB-Real-Time-Advanced-Analytics-main.zip" -Destination "C:\CosmosMCW\"
 
  
 
