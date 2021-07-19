@@ -69,7 +69,7 @@ $deploymentId =  (Get-AzResourceGroup -Name $resourceGroupName).Tags["Deployment
 
 #template deployment
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
-  -TemplateUri "https://cosmosdb1.blob.core.windows.net/cosmosdb/synapse.json" `
+  -TemplateUri "https://github.com/Shivashant25/ARM-templates/blob/main/synapse.json" `
   -deploymentId $DID
 
  
