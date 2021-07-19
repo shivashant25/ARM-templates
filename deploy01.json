@@ -1,0 +1,584 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "DID": {
+            "type": "String",
+            "metadata": {
+                "description": "Suffix added to all resource names to make them unique. Use a maximum of 3 random characters. Four or more characters will be ignored."
+            }
+        },
+        "autoscaleMaxThroughput": {
+            "defaultValue": 4000,
+            "minValue": 400,
+            "maxValue": 4000,
+            "type": "Int",
+            "metadata": {
+                "description": "Maximum throughput when using Autoscale Throughput Policy for the container"
+            }
+        },
+        "adminUsername": {
+            "type": "String"
+        },
+        "adminPassword": {
+            "type": "SecureString"
+        },
+         "azureUsername": {
+            "type": "String"
+        },
+        "azurePassword": {
+            "type": "SecureString"
+        }
+
+    },
+    "variables": {
+        "postInstallParameters": "[concat(' -adminUsername ', parameters('adminUsername'), ' -adminPassword ', parameters('adminPassword'), ' -tenantID ', variables('tenantID'), ' -subscriptionID ', variables('subscriptionID'), ' -DID ', parameters('DID'), ' -azureUsername ', parameters('azureUsername'), ' -azurePassword ', parameters('azurePassword')) ]",
+        "name_suffix": "[parameters('DID')]",
+        "primary_region": "East US",
+        "secondary_region": "West US",
+        "cosmosdb_databaseAccount_name": "[concat('woodgrove-db-', variables('name_suffix'))]",
+        "cosmosdb_region": "[variables('primary_region')]",
+        "cosmosdb_region_secondary": "[variables('secondary_region')]",
+        "cosmosdb_databaseName": "Woodgrove",
+        "cosmosdb_containerName": "transactions",
+        "cosmosdb_containerName2": "suspicious_transactions",
+        "cosmosdb_containerName3": "metadata",
+        "throughputPolicy": {
+            "Autoscale": {
+                "autoscaleSettings": {
+                    "maxThroughput": "[parameters('autoscaleMaxThroughput')]"
+                }
+            }
+        },
+        "datalake_storageAccount_name": "[concat('adlsgen2stg', variables('name_suffix'))]",
+        "datalake_region": "[variables('secondary_region')]",
+        "eventhub_namespace_name": "[concat('woodgrove-', variables('name_suffix'))]",
+        "eventhub_region": "[variables('primary_region')]",
+        "keyvault_name": "[concat('woodgrove-', variables('name_suffix'))]",
+        "keyvault_region": "[variables('primary_region')]",
+        "sqlAdministratorLogin": "asa.sql.admin",
+        "workspaceName": "[concat('asaworkspace', variables('name_suffix'))]",
+        "adlsStorageAccountName": "[concat('asadatalake', variables('name_suffix'))]",
+        "defaultDataLakeStorageFilesystemName": "defaultfs",
+        "sparkComputeName": "SparkPool01",
+        "computeSubnetId": "",
+        "storageBlobDataContributorRoleID": "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+        "defaultDataLakeStorageAccountUrl": "[concat('https://', variables('adlsStorageAccountName'), '.dfs.core.windows.net')]",
+        "sparkAutoScaleEnabled": "true",
+        "sparkMinNodeCount": "3",
+        "sparkMaxNodeCount": "4",
+        "sparkNodeCount": "0",
+        "sparkNodeSizeFamily": "MemoryOptimized",
+        "sparkNodeSize": "Small",
+        "sparkAutoPauseEnabled": "true",
+        "sparkAutoPauseDelayInMinutes": "15",
+        "sparkVersion": "2.4",
+        "packagesRequirementsFileName": "requirements.txt",
+        "packagesRequirementsContent": "onnxruntime==1.0.0\nwerkzeug==0.16.1\nnimbusml==1.7.1\nruamel.yaml==0.16.9\nazureml-train-automl-runtime==1.6.0\nscikit-learn==0.20.3\nnumpy==1.16.2\nazureml-core==1.10.0.post1\npandas==0.23.4\npy-cpuinfo==5.0.0\nscipy==1.4.1\n",
+        "blobStorageAccountName": "[concat('asastore', variables('name_suffix'))]",
+        "applicationInsightsName": "[concat('asaappinsights', variables('name_suffix'))]",
+        "amlWorkspaceName": "[concat('amlworkspace', variables('name_suffix'))]",
+        "virtualNetworkName": "vNet",
+        "vmName": "[concat('MainVM-', variables('name_suffix'))]",
+        "virtualMachineSize": "Standard_DS2_v2",
+        "networkInterfaceName": "[concat(variables('vmName'), '-nic')]",
+        "networkSecurityGroupName": "[concat(variables('vmName'), '-nsg')]",
+        "publicIpAddressName": "[concat(variables('vmName'), '-pip')]",
+        "publicIpAddressDNSName": "[concat('labvm', parameters('DID'))]",
+        "subnetName": "subnet1",
+        "location": "[resourceGroup().location]",
+        "tenantID": "[subscription().tenantId]",
+        "subscriptionID": "[subscription().subscriptionId]",
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/',variables('virtualNetworkName'), variables('subnetName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "apiVersion": "2020-04-01",
+            "name": "[variables('cosmosdb_databaseAccount_name')]",
+            "location": "[variables('cosmosdb_region')]",
+            "kind": "GlobalDocumentDB",
+            "properties": {
+                "enableAutomaticFailover": false,
+                "enableMultipleWriteLocations": true,
+                "databaseAccountOfferType": "Standard",
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session"
+                },
+                "enableAnalyticalStorage": true,
+                "locations": [
+                    {
+                        "locationName": "[variables('cosmosdb_region')]",
+                        "failoverPriority": 0
+                    },
+                    {
+                        "locationName": "[variables('cosmosdb_region_secondary')]",
+                        "failoverPriority": 1
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(variables('cosmosdb_databaseAccount_name'), '/', variables('cosmosdb_databaseName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/', variables('cosmosdb_databaseAccount_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "[variables('cosmosdb_databaseName')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(variables('cosmosdb_databaseAccount_name'), '/', variables('cosmosdb_databaseName'), '/', variables('cosmosdb_containerName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosdb_databaseAccount_name'), variables('cosmosdb_databaseName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "[variables('cosmosdb_containerName')]",
+                    "partitionKey": {
+                        "paths": [
+                            "/ipCountryCode"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "analyticalStorageTtl": -1
+                },
+                "options": "[variables('throughputPolicy')['Autoscale']]"
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(variables('cosmosdb_databaseAccount_name'), '/', variables('cosmosdb_databaseName'), '/', variables('cosmosdb_containerName2'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosdb_databaseAccount_name'), variables('cosmosdb_databaseName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "[variables('cosmosdb_containerName2')]",
+                    "partitionKey": {
+                        "paths": [
+                            "/ipCountryCode"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "analyticalStorageTtl": -1
+                },
+                "options": "[variables('throughputPolicy')['Autoscale']]"
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(variables('cosmosdb_databaseAccount_name'), '/', variables('cosmosdb_databaseName'), '/', variables('cosmosdb_containerName3'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosdb_databaseAccount_name'), variables('cosmosdb_databaseName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "[variables('cosmosdb_containerName3')]",
+                    "partitionKey": {
+                        "paths": [
+                            "/accountID"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "analyticalStorageTtl": -1
+                },
+                "options": "[variables('throughputPolicy')['Autoscale']]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-07-01",
+            "name": "[variables('datalake_storageAccount_name')]",
+            "location": "[variables('datalake_region')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "isHnsEnabled": true,
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "enabled": true
+                        },
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces",
+            "apiVersion": "2017-04-01",
+            "name": "[variables('eventhub_namespace_name')]",
+            "location": "[variables('eventhub_region')]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard",
+                "capacity": 1
+            },
+            "properties": {
+                "isAutoInflateEnabled": false,
+                "maximumThroughputUnits": 0
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(variables('eventhub_namespace_name'), '/RootManageSharedAccessKey')]",
+            "location": "[variables('eventhub_region')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('eventhub_namespace_name'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(variables('eventhub_namespace_name'), '/transactions')]",
+            "location": "[variables('eventhub_region')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', variables('eventhub_namespace_name'))]"
+            ],
+            "properties": {
+                "messageRetentionInDays": 1,
+                "partitionCount": 10,
+                "status": "Active"
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(variables('eventhub_namespace_name'), '/transactions/$Default')]",
+            "location": "[variables('eventhub_region')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('eventhub_namespace_name'), 'transactions')]",
+                "[resourceId('Microsoft.EventHub/namespaces', variables('eventhub_namespace_name'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2016-10-01",
+            "name": "[variables('keyvault_name')]",
+            "location": "[variables('keyvault_region')]",
+            "properties": {
+                "managedResourceGroupId": "[resourceGroup().id]",
+                "sku": {
+                    "family": "A",
+                    "name": "Standard"
+                },
+                "accessPolicies": [],
+                "tenantId": "[subscription().tenantId]",
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": false
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-04-01",
+            "name": "[variables('blobStorageAccountName')]",
+            "location": "[variables('primary_region')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "encryption": {
+                    "services": {
+                        "blob": {
+                            "enabled": true
+                        },
+                        "file": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "supportsHttpsTrafficOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('blobStorageAccountName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('blobStorageAccountName'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+       
+        
+       
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2018-05-01-preview",
+            "name": "[variables('applicationInsightsName')]",
+            "location": "[if(or(equals(variables('primary_region'),'eastus2'),equals(variables('primary_region'),'westcentralus')),'southcentralus',variables('primary_region'))]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        },
+        {
+            "type": "Microsoft.MachineLearningServices/workspaces",
+            "apiVersion": "2020-03-01",
+            "name": "[variables('amlWorkspaceName')]",
+            "location": "[variables('primary_region')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('blobStorageAccountName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', variables('keyvault_name'))]",
+                "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
+            ],
+            "sku": {
+                "tier": "Enterprise",
+                "name": "Enterprise"
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "friendlyName": "[variables('amlWorkspaceName')]",
+                "keyVault": "[resourceId('Microsoft.KeyVault/vaults',variables('keyvault_name'))]",
+                "applicationInsights": "[resourceId('Microsoft.Insights/components',variables('applicationInsightsName'))]",
+                "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts/',variables('blobStorageAccountName'))]",
+                "hbiWorkspace": false,
+                "allowPublicAccessWhenBehindVnet": false
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('blobStorageAccountName'), '/default/azureml')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('blobStorageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('blobStorageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2017-03-30",
+            "name": "[variables('vmName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "osProfile": {
+                    "computerName": "[variables('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVmAgent": "true"
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[variables('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftVisualStudio",
+                        "offer": "VisualStudio",
+                        "sku": "VS-2017-Comm-Latest-WS2016",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "name": "[concat(variables('vmName'), '-osdisk')]",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        }
+                    },
+                    "dataDisks": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('vmName'),'/', 'winExtension')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "tags": {
+                "displayName": "VM Extension"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.8",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
+                        "https://github.com/Shivashant25/ARM-templates/blob/main/script01.ps1"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File cosmos1.ps1', variables('postInstallParameters'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2017-08-01",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.100.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "10.100.0.0/24"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2016-09-01",
+            "name": "[variables('networkInterfaceName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2017-08-01",
+            "name": "[variables('publicIpAddressName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(variables('publicIpAddressDNSName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2017-06-01",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "priority": 1030,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "3389"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "MainVM DNS Name": {
+            "type": "String",
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]"
+        },
+        "MainVM Admin Username": {
+            "type": "String",
+            "value": "[parameters('adminUsername')]"
+        },
+        "MainVM Admin Password": {
+            "type": "String",
+            "value": "[parameters('adminPassword')]"
+        },
+        "CosmosDB Account Name": {
+            "type": "String",
+            "value": "[variables('cosmosdb_databaseName')]"
+        },
+        "cosmosDb Uri": {
+            "type": "String",
+            "value": "[concat('https://',variables('cosmosdb_databaseAccount_name'),'.documents.azure.com:443/')]"
+        },
+        "Datalake Storage Account Name": {
+            "type": "String",
+            "value": "[variables('datalake_storageAccount_name')]"
+        }
+    }
+}
