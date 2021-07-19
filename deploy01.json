@@ -464,7 +464,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File cosmos1.ps1', variables('postInstallParameters'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File script01.ps1', variables('postInstallParameters'))]"
                 }
             }
         },
