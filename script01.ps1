@@ -98,3 +98,6 @@ Expand-ZIPFile -File "C:\CosmosMCW\MCW-Cosmos-DB-Real-Time-Advanced-Analytics-ma
 $WebClient = New-Object System.Net.WebClient
 $WebClient.DownloadFile("https://download.microsoft.com/download/8/8/0/880BCA75-79DD-466A-927D-1ABF1F5454B0/PBIDesktopSetup_x64.exe","C:\Packages\PBIDesktop_x64.exe")
 Start-Process -FilePath "C:\Packages\PBIDesktop_x64.exe" -ArgumentList '-quiet','ACCEPT_EULA=1'
+
+#Install Curl
+choco install curl
