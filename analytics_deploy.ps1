@@ -167,14 +167,14 @@ Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "Passwor
 Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
 
 #checkdeployment
-$status = (Get-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy-synapse").ProvisioningState
+$status = (Get-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy").ProvisioningState
 $status
 if ($status -eq "Succeeded")
 {
  
     $ValidStatus="Pending"  ##Failed or Successful at the last step
     $ValidMessage="Main Deployment is successful, logontask is pending"
-Remove-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy-synapse"
+Remove-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy"
 
 # Scheduled Task
 $Trigger= New-ScheduledTaskTrigger -AtLogOn
