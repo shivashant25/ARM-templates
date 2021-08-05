@@ -1,251 +1,197 @@
-{
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "adminUsername": {
-      "type": "String"
-    },
-    "adminPassword": {
-      "type": "SecureString"
-    },
-    "AzureUserName": {
-      "type": "string"
-    },
-    "AzurePassword": {
-      "type": "securestring"
-    },
-    "ODLID": {
-      "type": "string"
-    },
-    "DeploymentID": {
-      "type": "string"
-    },
-    "azuserobjectid": {
-      "type": "String",
-      "metadata": {
-        "description": "The Object Id associated with the account you used to sign into the Azure portal. Retrieve this using the Azure CLI and 'az ad signed-in-user show --query objectId -o tsv'."
-      }
-    },
-    "InstallCloudLabsShadow": {
-      "type": "string",
-      "defaultValue": "yes",
-      "allowedValues": [
-        "yes",
-        "no"
-      ]
-    },
-    "trainerUserName": {
-      "type": "string"
-    },
-    "trainerUserPassword": {
-      "type": "string"
-    }
-  },
-  "variables": {
-    "cloudlabsCommon": "[concat(' -AzureUserName ', parameters('AzureUserName'), ' -AzurePassword ', parameters('AzurePassword'), ' -AzureTenantID ', variables('AzureTenantID'), ' -AzureSubscriptionID ', variables('AzureSubscriptionID'), ' -ODLID ', parameters('ODLID'), ' -DeploymentID ', parameters('DeploymentID'),' -azuserobjectid ', parameters('azuserobjectid'),' -InstallCloudLabsShadow ', parameters('InstallCloudLabsShadow'))]",
-    "Enable-CloudLabsEmbeddedShadow": "[concat(' -vmAdminUsername ', parameters('adminUsername'), ' -trainerUserName ', parameters('trainerUserName'), ' -trainerUserPassword ', parameters('trainerUserPassword'))]",
-    "AzureSubscriptionID": "[subscription().subscriptionId]",
-    "AzureTenantID": "[subscription().tenantId]",
-    "rgName": "[resourceGroup().name]",
-    "addressPrefix": "10.0.0.0/16",
-    "networkInterfaceName": "labvm-nic",
-    "networkSecurityGroupName": "labvm-nsg",
-    "publicIpAddressDNSName": "[concat('labvm-', uniqueString(resourceGroup().id))]",
-    "publicIpAddressName": "[concat('labvm-pip', uniqueString(resourceGroup().id))]",
-    "subnetName": "Subnet",
-    "subnetPrefix": "10.0.0.0/24",
-    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/',variables('virtualNetworkName'), variables('subnetName'))]",
-    "virtualMachineSize": "Standard_D2s_v3",
-    "virtualNetworkName": "labvm-vnet",
-    "vmName": "[concat('labvm-',parameters('DeploymentID'))]",
-    "adlsStorageAccountName": "[concat('asadatalake', parameters('DeploymentID'))]",
-    "location": "[resourceGroup().location]"
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2017-04-01",
-      "name": "[variables('virtualNetworkName')]",
-      "location": "[variables('location')]",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('addressPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[variables('subnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2017-08-01",
-      "name": "[variables('publicIpAddressName')]",
-      "location": "[variables('location')]",
-      "properties": {
-        "publicIpAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[concat(variables('publicIpAddressDNSName'))]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2017-03-30",
-      "name": "[variables('vmName')]",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
-      ],
-      "properties": {
-        "osProfile": {
-          "computerName": "[variables('vmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]",
-          "windowsConfiguration": {
-            "provisionVmAgent": "true"
-          }
-        },
-        "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSize')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "MicrosoftWindowsServer",
-            "offer": "WindowsServer",
-            "sku": "2019-Datacenter",
-            "version": "latest"
-          },
-          "osDisk": {
-            "createOption": "fromImage",
-            "name": "[concat(variables('vmName'), '-osdisk')]",
-            "managedDisk": {
-              "storageAccountType": "Premium_LRS"
-            }
-          },
-          "dataDisks": [
+Param (
+    [Parameter(Mandatory = $true)]
+    [string]
+    $AzureUserName,
 
-          ]
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
-            }
-          ]
-        }
-      },
-      "resources": [
-        {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('vmName'),'/', 'winExtension')]",
-          "apiVersion": "2015-06-15",
-          "location": "[resourceGroup().location]",
-          "comments": "Script",
-          "tags": {
-            "displayName": "VM Extension"
-          },
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Compute",
-            "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.8",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/instructor/psscript3.ps1",
-                "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1"
-              ]
-            },
-            "protectedSettings": {
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File synapse-tech-immersion/instructor/psscript3.ps1', variables('cloudlabsCommon'),variables('Enable-CloudLabsEmbeddedShadow'))]"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2017-06-01",
-      "name": "[variables('networkSecurityGroupName')]",
-      "location": "[variables('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-rdp",
-            "properties": {
-              "priority": 110,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "3389"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2016-09-01",
-      "name": "[variables('networkInterfaceName')]",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('subnetRef')]"
-              },
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-        }
-      }
-    }
-  ],
-  "outputs": {
-    "uniqueId": {
-      "type": "String",
-      "value": "[ parameters('DeploymentID')]"
-    },
-    "Storage Account Name": {
-      "type": "String",
-      "value": "[variables('adlsStorageAccountName')]"
-    },
-    "LABVM Admin Username": {
-      "type": "String",
-      "value": "[parameters('adminUsername')]"
-    },
-    "LABVM Admin Password": {
-      "type": "String",
-      "value": "[parameters('adminPassword')]"
-    },
-    "LABVM DNS Name": {
-      "type": "String",
-      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]"
-    }
-  }
+    [string]
+    $AzurePassword,
+
+    [string]
+    $AzureTenantID,
+
+    [string]
+    $AzureSubscriptionID,
+
+    [string]
+    $ODLID,
+    
+    [string]
+    $azuserobjectid,
+
+    [string]
+    $DeploymentID,
+
+    [string]
+    $InstallCloudLabsShadow,
+
+    [string]
+    $vmAdminUsername,
+
+    [string]
+    $trainerUserName,
+
+    [string]
+    $trainerUserPassword
+)
+
+Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsCustomScriptExtension.txt -Append
+[Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls" 
+
+#Import Common Functions
+$path = pwd
+$path=$path.Path
+$commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1"
+. $commonscriptpath
+
+#InstallManualStatusAgent
+CloudlabsManualAgent Install
+
+# Run Imported functions from cloudlabs-windows-functions.ps1
+WindowsServerCommon
+InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
+CreateCredFile $AzureUserName $AzurePassword $AzureTenantID $AzureSubscriptionID $DeploymentID $ODLID $AzureObjectId
+#InstallAzPowerShellModule
+InstallModernVmValidator
+
+#InstallAzPowerShellModule
+$WebClient = New-Object System.Net.WebClient
+$WebClient.DownloadFile("https://github.com/Azure/azure-powershell/releases/download/v5.0.0-October2020/Az-Cmdlets-5.0.0.33612-x64.msi","C:\Packages\Az-Cmdlets-5.0.0.33612-x64.msi")
+sleep 5
+
+Start-Process msiexec.exe -Wait '/I C:\Packages\Az-Cmdlets-5.0.0.33612-x64.msi /qn' -Verbose 
+
+#choco install az.powershell -y -force
+
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/SpektraSystems/CloudLabs-Azure/master/azure-synapse-analytics-workshop-400/artifacts/setup/azcopy.exe" -OutFile "C:\LabFiles\azcopy.exe"
+
+Add-Content -Path "C:\LabFiles\AzureCreds.txt" -Value "ODLID= $ODLID" -PassThru
+
+#Download lab files
+$WebClient = New-Object System.Net.WebClient
+$WebClient.DownloadFile("https://github.com/SollianceNet/azure-synapse-analytics-day/archive/master.zip","C:\azure-synapse-analytics-day-master.zip")
+
+#unziping folder
+function Expand-ZIPFile($file, $destination)
+{
+$shell = new-object -com shell.application
+$zip = $shell.NameSpace($file)
+foreach($item in $zip.items())
+{
+$shell.Namespace($destination).copyhere($item)
 }
+}
+Expand-ZIPFile -File "C:\azure-synapse-analytics-day-master.zip" -Destination "C:\LabFiles\"
+
+
+$WebClient = New-Object System.Net.WebClient
+$WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/testing-templates/Automation1_new1.zip","C:\Automation1.zip")
+#unziping folder
+function Expand-ZIPFile($file, $destination)
+{
+$shell = new-object -com shell.application
+$zip = $shell.NameSpace($file)
+foreach($item in $zip.items())
+{
+$shell.Namespace($destination).copyhere($item)
+}
+}
+Expand-ZIPFile -File "C:\Automation1.zip" -Destination "C:\LabFiles\"
+
+
+$LabFilesDirectory = "C:\LabFiles"
+
+$WebClient = New-Object System.Net.WebClient
+$WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/scripts/templateandstorage.ps1","C:\LabFiles\templateandstorage.ps1")
+
+$WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/scripts/automation.bat","C:\LabFiles\automation.bat")
+$WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/scripts/export.bat","C:\LabFiles\export.bat")
+
+#Download and Install PowerBi Desktop
+#$WebClient = New-Object System.Net.WebClient
+#$WebClient.DownloadFile("https://download.microsoft.com/download/3/C/0/3C0A5D40-85C6-4959-BB51-3A2087B18BCA/PBIDesktopRS_x64.msi","C:\Packages\PBIDesktop_x64.msi")
+#Start-Process msiexec.exe -Wait '/I C:\Packages\PBIDesktop_x64.msi /qr ACCEPT_EULA=1' 
+
+#Download power Bi desktop
+$WebClient = New-Object System.Net.WebClient
+$WebClient.DownloadFile("https://download.microsoft.com/download/8/8/0/880BCA75-79DD-466A-927D-1ABF1F5454B0/PBIDesktopSetup_x64.exe","C:\LabFiles\PBIDesktop_x64.exe")
+#Start-Process -FilePath "C:\LabFiles\PBIDesktop_x64.exe" -ArgumentList '-quit','ACCEPT_EULA=1'
+
+#Install synapse modules
+Install-PackageProvider NuGet -Force
+Install-Module -Name Az.Synapse -RequiredVersion 0.3.0 -AllowClobber -Force
+	
+#Install python
+Install-Package python3 -Scope CurrentUser -Force
+
+sleep 5
+Import-Module Az.Synapse
+
+. C:\LabFiles\AzureCreds.ps1
+
+$userName = $AzureUserName
+$password = $AzurePassword
+
+$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
+$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
+
+Connect-AzAccount -Credential $cred | Out-Null
+
+$resourceGroupName = (Get-AzResourceGroup | Where-Object { $_.ResourceGroupName -like "*Synapse-AIAD-*" }).ResourceGroupName
+$deploymentId =  (Get-AzResourceGroup -Name $resourceGroupName).Tags["DeploymentId"]
+
+# Template deployment
+$url = "https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/instructor/deploy-synapse.parameters.json"
+$output = "c:\LabFiles\parameters.json";
+$wclient = New-Object System.Net.WebClient;
+$wclient.CachePolicy = new-object System.Net.Cache.RequestCachePolicy([System.Net.Cache.RequestCacheLevel]::NoCacheNoStore);
+$wclient.Headers.Add("Cache-Control", "no-cache");
+$wclient.DownloadFile($url, $output)
+(Get-Content -Path "c:\LabFiles\parameters.json") | ForEach-Object {$_ -Replace "GET-AZUSER-PASSWORD", "$AzurePassword"} | Set-Content -Path "c:\LabFiles\parameters.json"
+(Get-Content -Path "c:\LabFiles\parameters.json") | ForEach-Object {$_ -Replace "GET-DEPLOYMENT-ID", "$DeploymentID"} | Set-Content -Path "c:\LabFiles\parameters.json"
+(Get-Content -Path "c:\LabFiles\parameters.json") | ForEach-Object {$_ -Replace "GET-AZUSER-UPN", "$AzureUserName "} | Set-Content -Path "c:\LabFiles\parameters.json"
+(Get-Content -Path "c:\LabFiles\parameters.json") | ForEach-Object {$_ -Replace "GET-AZUSER-OBJECTID", "$azuserobjectid"} | Set-Content -Path "c:\LabFiles\parameters.json"
+
+Write-Host "Starting main deployment." -ForegroundColor Green -Verbose
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateUri "https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/instructor/deploy.json" -TemplateParameterFile "c:\LabFiles\parameters.json"
+
+New-AzRoleAssignment -ResourceGroupName $resourceGroupName -ErrorAction Ignore -ObjectId "37548b2e-e5ab-4d2b-b0da-4d812f56c30e" -RoleDefinitionName "Owner"
+
+Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
+
+#Enable Autologon
+$AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoAdminLogon" -Value "1" -type String 
+Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultUsername" -Value "$($env:ComputerName)\demouser" -type String  
+Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "Password.1!!" -type String
+Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
+
+#checkdeployment
+$status = (Get-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy-synapse").ProvisioningState
+$status
+if ($status -eq "Succeeded")
+{
+ 
+    $ValidStatus="Pending"  ##Failed or Successful at the last step
+    $ValidMessage="Main Deployment is successful, logontask is pending"
+Remove-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy-synapse"
+
+# Scheduled Task
+$Trigger= New-ScheduledTaskTrigger -AtLogOn
+$User= "$($env:ComputerName)\demouser" 
+$Action= New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File $LabFilesDirectory\templateandstorage.ps1"
+Register-ScheduledTask -TaskName "Setup" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force 
+
+}
+else {
+    Write-Warning "Validation Failed - see log output"
+    $ValidStatus="Failed"  ##Failed or Successful at the last step
+    $ValidMessage="ARM template Deployment Failed"
+      }
+
+SetDeploymentStatus $ValidStatus $ValidMessage
+
+Stop-Transcript
+Sleep 10
+Restart-Computer -Force
+
