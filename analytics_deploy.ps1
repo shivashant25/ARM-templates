@@ -16,10 +16,10 @@ Param (
     $ODLID,
     
     [string]
-    $azuserobjectid,
+    $DeploymentID,
 
     [string]
-    $DeploymentID,
+    $azuserobjectid,
 
     [string]
     $InstallCloudLabsShadow,
@@ -47,12 +47,14 @@ $commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1
 #InstallManualStatusAgent
 CloudlabsManualAgent Install
 
+
 # Run Imported functions from cloudlabs-windows-functions.ps1
 WindowsServerCommon
 InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
 CreateCredFile $AzureUserName $AzurePassword $AzureTenantID $AzureSubscriptionID $DeploymentID $ODLID $AzureObjectId
 #InstallAzPowerShellModule
 InstallModernVmValidator
+
 
 #InstallAzPowerShellModule
 $WebClient = New-Object System.Net.WebClient
@@ -86,6 +88,7 @@ Expand-ZIPFile -File "C:\azure-synapse-analytics-day-master.zip" -Destination "C
 
 $WebClient = New-Object System.Net.WebClient
 $WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/testing-templates/Automation1_new1.zip","C:\Automation1.zip")
+
 #unziping folder
 function Expand-ZIPFile($file, $destination)
 {
@@ -102,7 +105,7 @@ Expand-ZIPFile -File "C:\Automation1.zip" -Destination "C:\LabFiles\"
 $LabFilesDirectory = "C:\LabFiles"
 
 $WebClient = New-Object System.Net.WebClient
-$WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/scripts/templateandstorage.ps1","C:\LabFiles\templateandstorage.ps1")
+$WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/scripts/templateandstorageaiad.ps1","C:\LabFiles\templateandstorage.ps1")
 
 $WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/scripts/automation.bat","C:\LabFiles\automation.bat")
 $WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/scripts/export.bat","C:\LabFiles\export.bat")
@@ -120,7 +123,8 @@ $WebClient.DownloadFile("https://download.microsoft.com/download/8/8/0/880BCA75-
 #Install synapse modules
 Install-PackageProvider NuGet -Force
 Install-Module -Name Az.Synapse -RequiredVersion 0.3.0 -AllowClobber -Force
-	
+
+
 #Install python
 Install-Package python3 -Scope CurrentUser -Force
 
@@ -140,8 +144,7 @@ Connect-AzAccount -Credential $cred | Out-Null
 $resourceGroupName = (Get-AzResourceGroup | Where-Object { $_.ResourceGroupName -like "*Synapse-AIAD-*" }).ResourceGroupName
 $deploymentId =  (Get-AzResourceGroup -Name $resourceGroupName).Tags["DeploymentId"]
 
-# Template deployment
-$url = "https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/instructor/deploy-synapse.parameters.json"
+$url = "https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/testing-templates/deploy-synapse.parameters.json"
 $output = "c:\LabFiles\parameters.json";
 $wclient = New-Object System.Net.WebClient;
 $wclient.CachePolicy = new-object System.Net.Cache.RequestCachePolicy([System.Net.Cache.RequestCacheLevel]::NoCacheNoStore);
@@ -153,11 +156,13 @@ $wclient.DownloadFile($url, $output)
 (Get-Content -Path "c:\LabFiles\parameters.json") | ForEach-Object {$_ -Replace "GET-AZUSER-OBJECTID", "$azuserobjectid"} | Set-Content -Path "c:\LabFiles\parameters.json"
 
 Write-Host "Starting main deployment." -ForegroundColor Green -Verbose
-New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateUri "https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/instructor/deploy.json" -TemplateParameterFile "c:\LabFiles\parameters.json"
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateUri "https://experienceazure.blob.core.windows.net/templates/synapse-tech-immersion/testing-templates/deploy-synapse.json" -TemplateParameterFile "c:\LabFiles\parameters.json"
+
 
 New-AzRoleAssignment -ResourceGroupName $resourceGroupName -ErrorAction Ignore -ObjectId "37548b2e-e5ab-4d2b-b0da-4d812f56c30e" -RoleDefinitionName "Owner"
 
 Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
+
 
 #Enable Autologon
 $AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
@@ -167,14 +172,14 @@ Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "Passwor
 Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
 
 #checkdeployment
-$status = (Get-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy").ProvisioningState
+$status = (Get-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy-synapse").ProvisioningState
 $status
 if ($status -eq "Succeeded")
 {
  
     $ValidStatus="Pending"  ##Failed or Successful at the last step
     $ValidMessage="Main Deployment is successful, logontask is pending"
-Remove-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy"
+Remove-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy-synapse"
 
 # Scheduled Task
 $Trigger= New-ScheduledTaskTrigger -AtLogOn
@@ -194,4 +199,3 @@ SetDeploymentStatus $ValidStatus $ValidMessage
 Stop-Transcript
 Sleep 10
 Restart-Computer -Force
-
