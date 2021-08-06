@@ -177,8 +177,8 @@ $status
 if ($status -eq "Succeeded")
 {
  
-    $ValidStatus="Pending"  ##Failed or Successful at the last step
-    $ValidMessage="Main Deployment is successful, logontask is pending"
+    $Validstatus="Pending"  ##Failed or Successful at the last step
+    $Validmessage="Main Deployment is successful, logontask is pending"
 Remove-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name "deploy-synapse"
 
 # Scheduled Task
@@ -190,11 +190,11 @@ Register-ScheduledTask -TaskName "Setup" -Trigger $Trigger -User $User -Action $
 }
 else {
     Write-Warning "Validation Failed - see log output"
-    $ValidStatus="Failed"  ##Failed or Successful at the last step
-    $ValidMessage="ARM template Deployment Failed"
+    $Validstatus="Failed"  ##Failed or Successful at the last step
+    $Validmessage="ARM template Deployment Failed"
       }
 
-SetDeploymentStatus $ValidStatus $ValidMessage
+CloudlabsManualAgent setStatus
 
 Stop-Transcript
 Sleep 10
