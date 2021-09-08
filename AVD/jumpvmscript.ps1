@@ -71,6 +71,7 @@ Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPas
 Install-PackageProvider -Name NuGet -RequiredVersion 2.8.5.201 -Force
 Install-Module AzureAD -Force
 
+New-Item -ItemType directory -Path C:\LabFiles
 
 $WebClient = New-Object System.Net.WebClient
 $WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/aiw-avd/scripts/logontask.ps1","C:\LabFiles\logontask.ps1")
