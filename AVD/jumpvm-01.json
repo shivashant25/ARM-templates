@@ -1,0 +1,285 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "jvmadminUsername": {
+      "type": "string"
+    },
+    "jvmadminPassword": {
+      "type": "securestring"
+    },
+    "AzureUserName": {
+      "type": "string"
+    },
+    "AzurePassword": {
+      "type": "securestring"
+    },
+    "ODLID": {
+      "type": "string"
+    },
+    "DeploymentID": {
+      "type": "string"
+    },
+    "InstallCloudLabsShadow": {
+      "type": "string",
+      "defaultValue": "yes",
+      "allowedValues": [
+        "yes",
+        "no"
+      ]
+    },
+    "hostPoolName": {
+      "type": "string",
+      "defaultValue": "wvd-immersion"
+    },
+    "hostpoolToken": {
+      "type": "string",
+      "defaultValue": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVGRjc0N0JFODhCREFCMjQ0ODU1NkFGQjQwRTk3MkUyQUVGNjM2ODciLCJ0eXAiOiJKV1QifQ.eyJSZWdpc3RyYXRpb25JZCI6IjQ4ZjE1NjE2LThhYjUtNGZmYi05OTJhLTdiMWQxM2UzZTk5OCIsIkJyb2tlclVyaSI6Imh0dHBzOi8vcmRicm9rZXItZy11cy1yMC53dmQubWljcm9zb2Z0LmNvbS8iLCJEaWFnbm9zdGljc1VyaSI6Imh0dHBzOi8vcmRkaWFnbm9zdGljcy1nLXVzLXIwLnd2ZC5taWNyb3NvZnQuY29tLyIsIkVuZHBvaW50UG9vbElkIjoiNjVkM2ViNWUtMWEwNi00MTIxLTk3YTQtNzE4MDJkNDI4Y2JhIiwiR2xvYmFsQnJva2VyVXJpIjoiaHR0cHM6Ly9yZGJyb2tlci53dmQubWljcm9zb2Z0LmNvbS8iLCJHZW9ncmFwaHkiOiJVUyIsIm5iZiI6MTYwMzQ1OTgxMywiZXhwIjoxNjA1NzI0MjAwLCJpc3MiOiJSREluZnJhVG9rZW5NYW5hZ2VyIiwiYXVkIjoiUkRtaSJ9.UG3kratJeDaLz5qJxPKpGwn1UeNas4hUmUlO6jqlOn6PpAI59IHgWXXUwgECrx7TWgOqYZANmsyYjq4ZhFQt8kgsdCVmfSARrKWwU8jUEaBQukIe65vax7EFt1mvQ3K6zJl5eMFTglzvpTq8FE5FzewRplY7K-z9mlXeHSqVKUPAz-xSM4CXnmWbxGEUR17ClWfbeirVtv5oIBI1ZqOcChXT7cQrFJJne6MUoPmOj3o5Hftb-BROH4Sh7piw87NCMDjdfk1YkALCbI3cGuXkcenzuG_J8w7p_I07Bb44nCvWojbnznVsWRKnNBJXpOO_G8oKaPFNciJMJdSnJ3RAFA"
+    },
+    "trainerUserName": {
+      "type": "string"
+    },
+    "trainerUserPassword": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "jvmcloudlabsCommon": "[concat(' -AzureUserName ', parameters('AzureUserName'), ' -InstallCloudLabsShadow ', parameters('InstallCloudLabsShadow'), ' -AzurePassword ', parameters('AzurePassword'), ' -AzureTenantID ', variables('AzureTenantID'), ' -AzureSubscriptionID ', variables('AzureSubscriptionID'), ' -ODLID ', parameters('ODLID'), ' -DeploymentID ', parameters('DeploymentID'))]",
+    "Enable-CloudLabsEmbeddedShadow": "[concat(' -vmAdminUsername ', parameters('jvmadminUsername'), ' -trainerUserName ', parameters('trainerUserName'), ' -trainerUserPassword ', parameters('trainerUserPassword'))]",
+    "AzureSubscriptionID": "[subscription().subscriptionId]",
+    "AzureTenantID": "[subscription().tenantId]",
+    "jvmvnetName": "vNet",
+    "jvnamePrefix": "jumpvm",
+    "jvmName": "[concat('JumpVM-',parameters('DeploymentID'))]",
+    "jvmsize": "Standard_DS2_v2",
+    "jvmnetworkInterfaceName": "[concat(variables('jvnamePrefix'), '-nic')]",
+    "jvmnetworkSecurityGroupName": "[concat(variables('jvnamePrefix'), '-nsg')]",
+    "jvmpublicIpAddressName": "[concat(variables('jvnamePrefix'), '-pip')]",
+    "jvmpublicIpAddressDNSName": "[concat(variables('jvnamePrefix'), parameters('DeploymentID'))]",
+    "jvmsubnetName": "default",
+    "jvmsubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/',variables('jvmvnetName'), variables('jvmsubnetName'))]",
+    "dscname": "dscextension",
+    "storagename": "[concat('fslogixprofilestg',parameters('DeploymentID'))]",
+    "workspacename": "[concat('avd-monitoring-la-',parameters('DeploymentID'))]",
+    "avduser01": "[concat('AVDUser01@',variables('AzureTenantID'))]",
+    "avduser02": "[concat('AVDUser02@',variables('AzureTenantID'))]",
+    "avduserPassword": "Azure1234567"
+
+
+  },
+  "resources": [
+    {
+      "name": "[variables('jvmName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2019-03-01",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', variables('jvmnetworkInterfaceName'))]"
+      ],
+      "properties": {
+        "osProfile": {
+          "computerName": "[variables('jvmName')]",
+          "adminUsername": "[parameters('jvmadminUsername')]",
+          "adminPassword": "[parameters('jvmadminPassword')]",
+          "windowsConfiguration": {
+            "enableAutomaticUpdates": true,
+            "provisionVmAgent": true
+          }
+        },
+        "hardwareProfile": {
+          "vmSize": "[variables('jvmsize')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "fromImage",
+            "name": "[concat(variables('jvmName'), '-osdisk')]",
+            "managedDisk": {
+              "storageAccountType": "Premium_LRS"
+            }
+          },
+          "dataDisks": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('jvmnetworkInterfaceName'))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('jvmname'),'/extension')]",
+      "apiVersion": "2019-07-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/',variables('jvmname'))]",
+        "[concat('Microsoft.Compute/virtualMachines/', variables('jvmname') , '/extensions/', variables('dscname'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.8",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
+            "https://experienceazure.blob.core.windows.net/templates/aiw-avd-v2/scripts/jumpvmscript.ps1"
+          ],
+          "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File aiw-avd/scripts/jumpvmscript.ps1', variables('jvmcloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
+        }
+      }
+    },
+    {
+      "apiVersion": "2018-10-01",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('jvmname'), '/', 'dscextension')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('jvmname'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.73",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "modulesUrl": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration.zip",
+          "configurationFunction": "Configuration.ps1\\AddSessionHost",
+          "properties": {
+            "hostPoolName": "[parameters('hostPoolName')]",
+            "registrationInfoToken": "[parameters('hostpoolToken')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[variables('jvmvnetName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2019-09-01",
+      "location": "[variables('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('jvmsubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('jvmnetworkInterfaceName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2019-07-01",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('jvmvnetName'))]",
+        "[concat('Microsoft.Network/publicIpAddresses/', variables('jvmpublicIpAddressName'))]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('jvmnetworkSecurityGroupName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('jvmsubnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', variables('jvmpublicIpAddressName'))]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('jvmnetworkSecurityGroupName'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('jvmpublicIpAddressName')]",
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2019-07-01",
+      "location": "[variables('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "Static",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(variables('jvmpublicIpAddressDNSName'))]"
+        }
+      }
+    },
+    {
+      "name": "[variables('jvmnetworkSecurityGroupName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-07-01",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "priority": 1030,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "3389"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "AVD User 01": {
+      "type": "string",
+      "value": "[variables('avduser01')]"
+    },
+    "AVD User 02": {
+      "type": "string",
+      "value": "[variables('avduser02')]"
+    },
+    "AVD User Password": {
+      "type": "string",
+      "value": "[variables('avduserPassword')]"
+    },
+    "JumpVM DNS Name": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('jvmpublicIpAddressName'))).dnsSettings.fqdn]"
+    },
+    "JumpVM Username": {
+      "type": "string",
+      "value": "[parameters('jvmadminUsername')]"
+    },
+    "JumpVM Password": {
+      "type": "string",
+      "value": "[parameters('jvmadminPassword')]"
+    },
+    "Storage Account Name": {
+      "type": "string",
+      "value": "[variables('storagename')]"
+    },
+    "Log Analytics Workspace Name": {
+      "type": "string",
+      "value": "[variables('workspacename')]"
+    }
+  }
+  }
