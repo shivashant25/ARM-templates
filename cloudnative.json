@@ -1,0 +1,716 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "String"
+        },
+        "adminPassword": {
+            "type": "SecureString"
+        },
+        "sshKeyData": {
+            "type": "SecureString"
+        },
+        "InstallCloudLabsShadow": {
+            "defaultValue": "yes",
+            "allowedValues": [
+                "yes",
+                "no"
+            ],
+            "type": "String",
+            "metadata": {
+                "description": "Required for CloudlabsShadow, value should be yes if you want to install otherwise no"
+            }
+        },
+        "AzureUserName": {
+            "type": "String",
+            "metadata": {
+                "description": "AzureUserName, AzurePassword, DeploymentID parameters are required for Azure Creds file, Must use in all Windows LabVMs "
+            }
+        },
+        "AzurePassword": {
+            "type": "SecureString"
+        },
+        "ODLID": {
+            "type": "String"
+        },
+        "KubernetesServicePrincipalClientId": {
+            "type": "SecureString"
+        },
+        "KubernetesServicePrincipalClientSecret": {
+            "type": "SecureString"
+        },
+        "KubernetesServicePrincipalRoleGuid": {
+            "defaultValue": "[guid(resourceGroup().id)]",
+            "type": "String"
+        },
+        "objectID": {
+            "type": "String"
+        },
+        "CosmosLocation": {
+            "defaultValue": "eastus",
+            "type": "String"
+        },
+        "CosmosLocationName": {
+            "defaultValue": "East US",
+            "type": "String"
+        },
+        "CosmosPairedLocation": {
+            "defaultValue": "westus",
+            "type": "String"
+        },
+        "CosmosPairedLocationName": {
+            "defaultValue": "West US",
+            "type": "String"
+        },
+        "deploymentID": {
+            "type": "String"
+        },
+        "trainerUserName": {
+            "type": "String"
+        },
+        "trainerUserPassword": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "osDiskType": "StandardSSD_LRS",
+        "location": "[resourceGroup().location]",
+        "virtualNetworkName": "[concat('fabmedical', '-vnet')]",
+        "virtualNetworAddressPrefixes": [
+            "172.16.0.0/16"
+        ],
+        "virtualNetworkSubnets": [
+            {
+                "name": "default",
+                "properties": {
+                    "addressPrefix": "172.16.0.0/24"
+                }
+            }
+        ],
+        "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+        "subnetName": "default",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+        "networkSecurityGroupName": "[concat('labvm', '-nsg')]",
+        "networkSecurityGroupRules": [
+            {
+                "name": "RDP",
+                "properties": {
+                    "priority": 300,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "3389"
+                }
+            }
+        ],
+        "publicIpAddressName": "[concat('labvm', '-ip')]",
+        "publicIpAddressType": "Dynamic",
+        "publicIpAddressSku": "Basic",
+        "networkInterfaceName": "[concat('labvm-', 'nic')]",
+        "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
+        "virtualMachineName": "[concat('labvm-', parameters('deploymentID'))]",
+        "virtualMachineSize": "Standard_DS2_v2",
+        "networkSecurityGroupNameLinux": "[concat('fabmedical', '-nsg')]",
+        "networkSecurityGroupRulesLinux": [
+            {
+                "name": "SSH",
+                "properties": {
+                    "priority": 300,
+                    "protocol": "TCP",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "22"
+                }
+            },
+            {
+                "name": "allow-app-endpoints",
+                "properties": {
+                    "priority": 301,
+                    "protocol": "*",
+                    "access": "Allow",
+                    "direction": "Inbound",
+                    "sourceAddressPrefix": "*",
+                    "sourcePortRange": "*",
+                    "destinationAddressPrefix": "*",
+                    "destinationPortRange": "3000-3010"
+                }
+            }
+        ],
+        "cloudlabsCommon": "[concat(' -AzureUserName ', parameters('AzureUserName'), ' -AzurePassword ', parameters('AzurePassword'), ' -AzureTenantID ', variables('AzureTenantID'), ' -AzureSubscriptionID ', variables('AzureSubscriptionID'), ' -ODLID ', parameters('ODLID'), ' -DeploymentID ', parameters('DeploymentID'),' -InstallCloudLabsShadow ', parameters('InstallCloudLabsShadow'))]",
+        "Enable-CloudLabsEmbeddedShadow": "[concat(' -vmAdminUsername ', parameters('adminUsername'), ' -trainerUserName ', parameters('trainerUserName'))]",
+        "publicIpAddressNameLinux": "[concat('fabmedical-', 'ip')]",
+        "AzureSubscriptionID": "[subscription().subscriptionId]",
+        "AzureTenantID": "[subscription().tenantId]",
+        "publicIpAddressTypeLinux": "Static",
+        "publicIpAddressSkuLinux": "Basic",
+        "networkInterfaceNameLinux": "[concat('fabmedical-', parameters('deploymentID'))]",
+        "nsgIdLinux": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupNameLinux'))]",
+        "sshKeyPath": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+        "virtualMachineNameLinux": "fabmedical",
+        "virtualMachineSizeLinux": "Standard_D2s_v3",
+        "registryName": "[concat('acr', parameters('deploymentID'))]",
+        "registrySku": "Standard",
+        "registryAdminUserEnabled": true,
+        "kubernetesClusterName": "[concat('fabmedical-', parameters('deploymentID'))]",
+        "kubernetesVersion": "1.19.11",
+        "kubernetesDnsPrefix": "[concat('fabmedical-', parameters('deploymentID'), '-dns')]",
+        "kubernetesAgentOsType": "Linux",
+        "kubernetesAgentOsDiskSizeGB": 0,
+        "kubernetesAgentCount": 2,
+        "kubernetesAgentVmSize": "Standard_D2_v2",
+        "kubernetesNetworkProfilePlugin": "kubenet",
+        "kubernetesRBACEnabled": true,
+        "logAnalyticsName": "[concat('fabmedical-', parameters('deploymentID'))]",
+        "logAnalyticsSku": "standalone",
+        "logAnalyticsId": "[resourceId(resourceGroup().name, 'Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]",
+        "cosmosName": "[concat('fabmedical-', parameters('deploymentID'))]",
+        "cosmosSku": "Standard",
+        "cosmosApi": "MongoDB",
+        "cosmosApiExperience": "Azure Cosmos DB for MongoDB API",
+        "appInsightsNames": [
+            "content-web",
+            "content-api"
+        ],
+        "ubuntuExtensionScriptFolder": "CustomScripts",
+        "ubuntuExtensionScriptFileName": "shellscripts.sh ",
+        "publicIpAddressDNSName": "[concat('fabmedicald', parameters('deploymentID'))]",
+        "publicIpAddressDNSNameLinux": "[concat('fabmedical', parameters('deploymentID'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "name": "pid-e843308b-3ce2-42a2-b743-2f21b36a5e68",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "securityRules": "[variables('networkSecurityGroupRules')]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[variables('virtualNetworAddressPrefixes')]"
+                },
+                "subnets": "[variables('virtualNetworkSubnets')]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('publicIpAddressName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[variables('publicIpAddressSku')]"
+            },
+            "properties": {
+                "publicIpAllocationMethod": "[variables('publicIpAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(variables('publicIpAddressDNSName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "name": "[variables('networkInterfaceName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgId')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-06-01",
+            "name": "[variables('virtualMachineName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "osProfile": {
+                    "computerName": "[variables('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVmAgent": "true"
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[variables('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "microsoftvisualstudio",
+                        "offer": "visualstudio2019latest",
+                        "sku": "vs-2019-ent-latest-ws2019",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2018-06-01",
+            "name": "[concat(variables('virtualMachineName'),'/', 'winExtension')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('virtualMachineName'))]"
+            ],
+            "tags": {
+                "displayName": "VM Extension"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.8",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://experienceazure.blob.core.windows.net/templates/cloud-native-application/scripts/psscripts.ps1",
+                        "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Bypass -File cloud-native-application/scripts/psscripts.ps1',variables('cloudlabsCommon'),variables('Enable-CloudLabsEmbeddedShadow'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('networkSecurityGroupNameLinux')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "securityRules": "[variables('networkSecurityGroupRulesLinux')]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('publicIpAddressNameLinux')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[variables('publicIpAddressSkuLinux')]"
+            },
+            "properties": {
+                "publicIpAllocationMethod": "[variables('publicIpAddressTypeLinux')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(variables('publicIpAddressDNSNameLinux'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "name": "[variables('networkInterfaceNameLinux')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupNameLinux'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressNameLinux'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', variables('publicIpAddressNameLinux'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgIdLinux')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "name": "[variables('virtualMachineNameLinux')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceNameLinux'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('virtualMachineSizeLinux')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "16.04-LTS",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceNameLinux'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[variables('virtualMachineNameLinux')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[variables('sshKeyPath')]",
+                                    "keyData": "[parameters('sshKeyData')]"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "resources": [
+                {
+                    "type": "extensions",
+                    "apiVersion": "2018-06-01",
+                    "name": "ubuntuExtension",
+                    "location": "[resourceGroup().location]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Compute/virtualMachines', variables('virtualMachineNameLinux'))]"
+                    ],
+                    "tags": {
+                        "displayName": "ubuntuExtension"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.OSTCExtensions",
+                        "type": "CustomScriptForLinux",
+                        "typeHandlerVersion": "1.4",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                            "fileUris": [
+                                "https://experienceazure.blob.core.windows.net/templates/cloud-native-application/scripts/shellscripts.sh"
+                            ],
+                            "commandToExecute": "[concat('sh ', variables('ubuntuExtensionScriptFileName'), parameters('adminUsername'))]"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.ContainerRegistry/registries",
+            "apiVersion": "2017-10-01",
+            "name": "[variables('registryName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[variables('registrySku')]"
+            },
+            "properties": {
+                "adminUserEnabled": "[variables('registryAdminUserEnabled')]"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "apiVersion": "2019-04-01",
+            "name": "[variables('kubernetesClusterName')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'WorkspaceDeployment-fabmedical-', parameters('deploymentID'))]"
+            ],
+            "properties": {
+                "kubernetesVersion": "[variables('kubernetesVersion')]",
+                "enableRBAC": "[variables('kubernetesRBACEnabled')]",
+                "dnsPrefix": "[variables('kubernetesDnsPrefix')]",
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "count": "[variables('kubernetesAgentCount')]",
+                        "osDiskSizeGB": "[variables('kubernetesAgentOsDiskSizeGB')]",
+                        "osType": "[variables('kubernetesAgentOsType')]",
+                        "vmSize": "[variables('kubernetesAgentVmSize')]",
+                        "storageProfile": "ManagedDisks",
+                        "type": "VirtualMachineScaleSets"
+                    }
+                ],
+                "servicePrincipalProfile": {
+                    "clientId": "[parameters('KubernetesServicePrincipalClientId')]",
+                    "secret": "[parameters('KubernetesServicePrincipalClientSecret')]"
+                },
+                "networkProfile": {
+                    "networkPlugin": "[variables('kubernetesNetworkProfilePlugin')]"
+                },
+                "addonProfiles": {
+                    "httpApplicationRouting": {
+                        "enabled": false
+                    },
+                    "omsagent": {
+                        "enabled": true,
+                        "config": {
+                            "logAnalyticsWorkspaceResourceID": "[variables('logAnalyticsId')]"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-11-01",
+            "name": "[concat('WorkspaceDeployment-fabmedical-', parameters('deploymentID'))]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.OperationalInsights/workspaces",
+                            "apiVersion": "2020-08-01",
+                            "name": "[variables('logAnalyticsName')]",
+                            "location": "[variables('location')]",
+                            "properties": {
+                                "sku": {
+                                    "name": "[variables('logAnalyticsSku')]"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-11-01",
+            "name": "[concat('SolutionDeployment-fabmedical-', parameters('deploymentID'))]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'WorkspaceDeployment-fabmedical-', parameters('deploymentID'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.OperationsManagement/solutions",
+                            "apiVersion": "2015-11-01-preview",
+                            "name": "[concat('ContainerInsights', '(', variables('logAnalyticsName'), ')')]",
+                            "location": "[variables('location')]",
+                            "properties": {
+                                "workspaceResourceId": "[variables('logAnalyticsId')]"
+                            },
+                            "plan": {
+                                "name": "[concat('ContainerInsights', '(', variables('logAnalyticsName'), ')')]",
+                                "product": "OMSGallery/ContainerInsights",
+                                "promotionCode": "",
+                                "publisher": "Microsoft"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-11-01",
+            "name": "[concat('ClusterMonitoringMetricPulisherRoleAssignmentDepl', parameters('deploymentID'))]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', variables('kubernetesClusterName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.ContainerService/managedClusters/providers/roleAssignments",
+                            "apiVersion": "2018-01-01-preview",
+                            "name": "[concat(variables('kubernetesClusterName'), '/Microsoft.Authorization/', parameters('KubernetesServicePrincipalRoleGuid'))]",
+                            "properties": {
+                                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/3913510d-42f4-4e42-8a64-420c390055eb')]",
+                                "principalId": "[parameters('objectID')]",
+                                "scope": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.ContainerService/managedClusters/', variables('kubernetesClusterName'))]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDb/databaseAccounts",
+            "apiVersion": "2015-04-08",
+            "name": "[variables('cosmosName')]",
+            "location": "[parameters('CosmosLocation')]",
+            "tags": {
+                "defaultExperience": "[variables('cosmosApiExperience')]"
+            },
+            "kind": "[variables('cosmosApi')]",
+            "properties": {
+                "databaseAccountOfferType": "[variables('cosmosSku')]",
+                "locations": [
+                    {
+                        "id": "[concat(variables('cosmosName'), '-', parameters('CosmosLocation'))]",
+                        "failoverPriority": 0,
+                        "locationName": "[parameters('CosmosLocationName')]"
+                    },
+                    {
+                        "id": "[concat(variables('cosmosName'), '-', parameters('CosmosPairedLocation'))]",
+                        "failoverPriority": 1,
+                        "locationName": "[parameters('CosmosPairedLocationName')]"
+                    }
+                ],
+                "enableMultipleWriteLocations": false,
+                "isVirtualNetworkFilterEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2015-05-01",
+            "name": "[variables('appInsightsNames')[copyIndex()]]",
+            "location": "[variables('location')]",
+            "kind": "web",
+            "properties": {
+                "ApplicationId": "[variables('appInsightsNames')[copyIndex()]]",
+                "Application_Type": "web",
+                "Flow_Type": "Bluefield",
+                "Request_Source": "rest"
+            },
+            "copy": {
+                "name": "appinsightscopy",
+                "count": "[length(variables('appInsightsNames'))]",
+                "mode": "Parallel"
+            }
+        }
+    ],
+    "outputs": {
+        "DeploymentID": {
+            "type": "String",
+            "value": "[parameters('DeploymentID')]"
+        },
+        "LabVM DNS Name": {
+            "type": "String",
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))).dnsSettings.fqdn]"
+        },
+        "LabVM Username": {
+            "type": "String",
+            "value": "[parameters('adminUsername')]"
+        },
+        "LabVM Password": {
+            "type": "String",
+            "value": "[parameters('adminPassword')]"
+        },
+        "Build Agent VM Public IP": {
+            "type": "String",
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressNameLinux'))).ipAddress]"
+        },
+        "Build Agent VM Dns Name": {
+            "type": "String",
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressNameLinux'))).dnsSettings.fqdn]"
+        },
+        "Build Agent VM Username": {
+            "type": "String",
+            "value": "[parameters('adminUsername')]"
+        },
+        "Build Agent VM Password": {
+            "type": "String",
+            "value": "[parameters('adminPassword')]"
+        },
+        "Command to Connect to Build Agent VM ": {
+            "type": "String",
+            "value": "[concat('ssh  adminfabmedical@', reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressNameLinux'))).dnsSettings.fqdn)]"
+        },
+        "acr LoginServer": {
+            "type": "String",
+            "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries',variables('registryName')),'2017-10-01').loginServer]"
+        },
+        "acr Username": {
+            "type": "String",
+            "value": "[variables('registryName')]"
+        },
+        "Build Agent VM Private IP": {
+            "type": "String",
+            "value": "[reference(concat(variables('networkInterfaceNameLinux'),0)).ipConfigurations[0].properties.privateIPAddress"
+        },
+        "MC Resource Group": {
+            "type": "String",
+            "value": "[concat('MC_fabmedical-', parameters('DeploymentID'),'_fabmedical-', parameters('DeploymentID'))]"
+        },
+        "acr Password": {
+            "type": "String",
+            "value": "[listCredentials(resourceId('Microsoft.ContainerRegistry/registries',variables('registryName')),'2017-10-01').passwords[0].value]"
+        }
+    }
+}
