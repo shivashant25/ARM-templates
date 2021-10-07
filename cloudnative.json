@@ -702,11 +702,11 @@
         },
         "Build Agent VM Private IP": {
             "type": "String",
-            "value": "[reference(concat(variables('networkInterfaceNameLinux'),0)).ipConfigurations[0].properties.privateIPAddress"
+            "value": "[reference(concat(variables('networkInterfaceNameLinux'),0)).ipConfigurations[0].properties.privateIPAddress]"
         },
         "MC Resource Group": {
             "type": "String",
-            "value": "[concat('MC_fabmedical-', parameters('DeploymentID'),'_fabmedical-', parameters('DeploymentID'))]"
+            "value": "[concat('MC_fabmedical-', parameters('DeploymentID'),'_fabmedical-', parameters('DeploymentID'), '_', variables('location'))]"
         },
         "acr Password": {
             "type": "String",
