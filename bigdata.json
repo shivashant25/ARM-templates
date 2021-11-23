@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Big Data and Visualization",
+    "Language": "English",
+    "BaseURL": "https://github.com/microsoft/MCW-Big-data-and-visualization",
+    "Files": [
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/alwinvw23/CloudLabs/master/LabIntro.md",
+        "Order": 1
+      },
+      {
+        "RawFilePath": "https://raw.githubusercontent.com/microsoft/MCW-Big-data-analytics-and-visualization/main/Hands-on%20lab/HOL%20step-by-step%20-%20Big%20data%20analytics%20and%20visualization.md",
+        "Order": 2
+      }
+    ]
