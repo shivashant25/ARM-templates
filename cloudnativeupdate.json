@@ -377,8 +377,7 @@
               "subnet": {
                 "id": "[variables('subnetRef')]"
               },
-              "privateIPAddress": "172.16.0.5",
-              "privateIPAllocationMethod": "Static",
+              "privateIPAllocationMethod": "Dynamic",
               "publicIpAddress": {
                 "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', variables('publicIpAddressNameLinux'))]"
               }
@@ -694,14 +693,6 @@
     "Command to Connect to Build Agent VM ": {
       "type": "string",
       "value": "[concat('ssh  adminfabmedical@', reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressNameLinux'))).dnsSettings.fqdn)]"
-    },
-    "Build Agent VM Private IP": {
-      "type": "String",
-      "value": "[reference(concat(variables('networkInterfaceNameLinux'),0)).ipConfigurations[0].properties.privateIPAddress]"
-    },
-    "MC Resource Group": {
-      "type": "String",
-      "value": "[concat('MC_fabmedical-', parameters('DeploymentID'),'_fabmedical-', parameters('DeploymentID'), '_', variables('location'))]"
     },
     "acr LoginServer": {
       "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries',variables('registryName')),'2017-10-01').loginServer]",
