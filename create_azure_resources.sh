@@ -7,9 +7,9 @@ function replace_json_field {
     rm "$tmpfile"
 }
 
-AZURE_CREDENTIALS={ "clientId": "943abbae-8858-4aae-b132-93efa094dd72", "clientSecret": "Spg32RMDOi66yQSyOIet4Bcrmv6Xx.1dT1", "subscriptionId": "a5932f36-63c8-4bc7-b97a-f90a2900b8a1", "tenantId": "495d5cd4-4a6c-4d4e-bdaa-5e1f96a097aa", "activeDirectoryEndpointUrl": "https://login.microsoftonline.com", "resourceManagerEndpointUrl": "https://management.azure.com/", "activeDirectoryGraphResourceId": "https://graph.windows.net/", "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/", "galleryEndpointUrl": "https://gallery.azure.com/", "managementEndpointUrl": "https://management.core.windows.net/" }
+AZURE_CREDENTIALS={ "clientId": "1c9046b8-1de8-423d-8c4e-ac3d2307e2c5", "clientSecret": "ebye41PTL*CT", "subscriptionId": "04b1e231-3aa7-49b7-9ff2-41a9eef7a1da", "tenantId": "338cad0a-9226-41c6-a09d-748ec1a0b210", "activeDirectoryEndpointUrl": "https://login.microsoftonline.com", "resourceManagerEndpointUrl": "https://management.azure.com/", "activeDirectoryGraphResourceId": "https://graph.windows.net/", "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/", "galleryEndpointUrl": "https://gallery.azure.com/", "managementEndpointUrl": "https://management.core.windows.net/" }
 
-# Check if SUFFIX envvar exists
+# Check if SUFFIX envvar existsebye41PTL*CT
 if [[ -z "${MCW_SUFFIX}" ]]; then
     echo "Please set the MCW_SUFFIX environment variable to a unique three character string."
     exit 1
