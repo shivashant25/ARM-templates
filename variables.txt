@@ -1,0 +1,11 @@
+https://github.com/Shivashant25/Fabmedical.git
+
+
+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
+
+
+export MCW_SUFFIX=510317                   # Needs to be a unique three letter string
+export MCW_GITHUB_USERNAME=Shivashant25 # Your Github account username
+export MCW_GITHUB_EMAIL=smm.yzfr1@gmail.com
+export MCW_GITHUB_TOKEN=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         # A personal access token for your Github account
+export MCW_GITHUB_URL=https://github.com/$MCW_GITHUB_USERNAME/Fabmedical.git
