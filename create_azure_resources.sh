@@ -46,7 +46,7 @@ sed -i "s/\[SUFFIX\]/$MCW_SUFFIX/g" ~/Fabmedical/.github/workflows/content-init.
 sed -i "s/\[SUFFIX\]/$MCW_SUFFIX/g" ~/Fabmedical/.github/workflows/content-api.yml
 sed -i "s/\[SUFFIX\]/$MCW_SUFFIX/g" ~/Fabmedical/.github/workflows/content-web.yml
 
-ACR_CREDENTIALS=$(az acr credential show -n acr$MCW_SUFFIX)
+ACR_CREDENTIALS=$(az acr credential show -n fabmedical$MCW_SUFFIX)
 ACR_USERNAME=$(jq -r -n '$input.username' --argjson input "$ACR_CREDENTIALS")
 ACR_PASSWORD=$(jq -r -n '$input.passwords[0].value' --argjson input "$ACR_CREDENTIALS")
 AZURE_CREDENTIALS=$(az ad sp create-for-rbac --sdk-auth)
