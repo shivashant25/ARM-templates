@@ -163,12 +163,12 @@ $nerdiotemplateSourceLocation = "https://raw.githubusercontent.com/Shivashant25/
 if ($status -eq "Succeeded")
 {
      
-   New-AzResourceGroupDeployment -ResourceGroupName $nerdioresourceGroupName -TemplateUri $nerdiotemplateSourceLocation #Deploy the template
+   New-AzResourceGroupDeployment -ResourceGroupName $nerdioresourceGroupName -TemplateUri $nerdiotemplateSourceLocation -Name "deploynerdio" #Deploy the template
 }
 
 
 #checkdeployment
-$status = (Get-AzResourceGroupDeployment -ResourceGroupName $nerdioresourceGroupName -Name "deploy-02").ProvisioningState
+$status = (Get-AzResourceGroupDeployment -ResourceGroupName $nerdioresourceGroupName -Name "deploynerdio").ProvisioningState
 $status
 if ($status -eq "Succeeded")
 {
