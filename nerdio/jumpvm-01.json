@@ -137,7 +137,7 @@
             "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
             "https://raw.githubusercontent.com/Shivashant25/ARM-templates/main/nerdio/jumpvmscript.ps1"
           ],
-          "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File nerdio/jumpvmscript.ps1', variables('jvmcloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
+          "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File jumpvmscript.ps1', variables('jvmcloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
         }
       }
     },
