@@ -1,0 +1,59 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "securityGuid": {
+            "defaultValue": "[newGuid()]",
+            "type": "String",
+            "metadata": {
+                "description": "Please do not change the value of this parameter."
+            }
+        },
+        "applicationResourceName": {
+            "defaultValue": "NMMAPP",
+            "type": "String"
+        },
+        "managedResourceGroupName": {
+            "defaultValue": "NMM-RESOURCES-RG",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "managedResourceGroupId": "[if(empty(parameters('managedResourceGroupName')),concat(subscription().id,'/resourceGroups/',take(concat(resourceGroup().name,'-',uniquestring(resourceGroup().id),uniquestring(parameters('applicationResourceName'))),90)),concat(subscription().id,'/resourceGroups/', parameters('managedResourceGroupName')))]",
+        "managedIdentity": {}
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Solutions/applications",
+            "apiVersion": "2017-09-01",
+            "name": "[parameters('applicationResourceName')]",
+            "location": "[resourceGroup().Location]",
+            "kind": "MarketPlace",
+            "identity": "[if(empty(variables('managedIdentity')),json('null'),variables('managedIdentity'))]",
+            "plan": {
+                "name": "nmm-plan",
+                "product": "nmm",
+                "publisher": "nerdio",
+                "version": "2.5.1"
+            },
+            "properties": {
+                "managedResourceGroupId": "[variables('managedResourceGroupId')]",
+                "parameters": {
+                    "location": {
+                        "value": "[resourceGroup().location]"
+                    },
+                    "_artifactsLocation": {
+                        "value": "https://catalogartifact.azureedge.net/publicartifacts/nerdio.nmm-c012a74e-a7a2-4211-b341-141b0db6d593-nmm-plan/Artifacts/DefaultTemplate"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": ""
+                    },
+                    "_securityGuid": {
+                        "value": "[parameters('SecurityGuid')]"
+                    }
+                },
+                "jitAccessPolicy": null
+            }
+        }
+    ]
+}
