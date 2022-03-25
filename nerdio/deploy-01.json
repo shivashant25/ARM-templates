@@ -1,0 +1,136 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "domainName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "domainConfigurationType": "FullySynced",
+    "sku": "Standard",
+    "filteredSync": "Disabled",
+    "notificationSettings": {
+      "notifyGlobalAdmins": "Disabled",
+      "notifyDcAdmins": "Disabled",
+      "additionalRecipients": []
+    },
+    "subnet1Name": "aadds-subnet",
+    "subnet2Name": "sessionhosts-subnet",
+    "vnetName": "aadds-vnet",
+    "vnetAddressPrefixes": [
+      "10.0.0.0/16"
+    ],
+    "subnet1AddressPrefix": "10.0.0.0/24",
+    "subnet2AddressPrefix": "10.0.1.0/24",
+    "nsgName": "aadds-nsg"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-06-01",
+      "type": "Microsoft.AAD/DomainServices",
+      "name": "[parameters('domainName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+      ],
+      "properties": {
+        "domainName": "[parameters('domainName')]",
+        "sku": "[variables('sku')]",
+        "subnetId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('vnetName'), '/subnets/', variables('subnet1Name'))]",
+        "filteredSync": "[variables('filteredSync')]",
+        "domainConfigurationType": "[variables('domainConfigurationType')]",
+        "notificationSettings": "[variables('notificationSettings')]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/NetworkSecurityGroups",
+      "name": "[variables('nsgName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowSyncWithAzureAD",
+            "properties": {
+              "access": "Allow",
+              "priority": 101,
+              "direction": "Inbound",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "AzureActiveDirectoryDomainServices",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "AllowPSRemoting",
+            "properties": {
+              "access": "Allow",
+              "priority": 301,
+              "direction": "Inbound",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "AzureActiveDirectoryDomainServices",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "5986"
+            }
+          },
+          {
+            "name": "AllowRD",
+            "properties": {
+              "access": "Allow",
+              "priority": 201,
+              "direction": "Inbound",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "CorpNetSaw",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "3389"
+            }
+          }
+        ]
+      },
+      "apiVersion": "2018-04-01"
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('vnetName')]",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2018-04-01",
+      "dependsOn": [
+        "[concat('Microsoft.Network/NetworkSecurityGroups/', variables('nsgName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": "[variables('vnetAddressPrefixes')]"
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnet1Name')]",
+            "properties": {
+              "addressPrefix": "[variables('subnet1AddressPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/NetworkSecurityGroups/', variables('nsgName'))]"
+              }
+            }
+          },
+          {
+            "name": "[variables('subnet2Name')]",
+            "properties": {
+              "addressPrefix": "[variables('subnet2AddressPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/NetworkSecurityGroups/', variables('nsgName'))]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "Domain Name": {
+      "type": "string",
+      "value": "[parameters('domainName')]"
+    }
+  }
+}
