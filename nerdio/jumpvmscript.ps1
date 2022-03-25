@@ -154,15 +154,16 @@ $status
 
 #Get RG Name 
 $nerdioresourceGroup = (Get-AzResourceGroup -Name "NMM-*") 
-$nerdioresourceGroupName = $resourceGroup[0].ResourceGroupName 
-$location = $resourceGroup[0].Location
+$nerdioresourceGroupName = $nerdioresourceGroup[0].ResourceGroupName 
+$location = $nerdioresourceGroup[0].Location
 
 $nerdiotemplateSourceLocation = "https://raw.githubusercontent.com/Shivashant25/ARM-templates/main/nerdio/deploy-02.json"
 
 #depoy NMM template
 if ($status -eq "Succeeded")
 {
-     
+   $agreementTerms = Get-AzMarketplaceTerms -Name 'nmm-plan' -Publisher 'nerdio' -Product 'nmm'
+   Set-AzMarketplaceTerms -Name 'nmm-plan' -Publisher 'nerdio' -Product 'nmm' -Terms $agreementTerms -Accept  
    New-AzResourceGroupDeployment -ResourceGroupName $nerdioresourceGroupName -TemplateUri $nerdiotemplateSourceLocation -Name "deploynerdio" #Deploy the template
 }
 
