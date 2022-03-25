@@ -163,7 +163,7 @@ $nerdiotemplateSourceLocation = "https://raw.githubusercontent.com/Shivashant25/
 if ($status -eq "Succeeded")
 {
      
-   New-AzResourceGroupDeployment -ResourceGroupName $nerdioresourceGroupName -TemplateUri $nerdiotemplateSourceLocation -TemplateParameterObject #Deploy the template
+   New-AzResourceGroupDeployment -ResourceGroupName $nerdioresourceGroupName -TemplateUri $nerdiotemplateSourceLocation #Deploy the template
 }
 
 
