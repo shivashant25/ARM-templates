@@ -102,5 +102,20 @@ $path = "C:\Workspaces\lab\mcw-continuous-delivery-lab-files\infrastructure"
 (Get-Content -Path "$path\deploy-infrastructure.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\deploy-infrastructure.ps1"
 (Get-Content -Path "$path\seed-cosmosdb.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\seed-cosmosdb.ps1"
 
+sleep 20
+
+cd 'C:\LabFiles\'
+
+.\validate.ps1
+
+#Import Common Functions
+$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.12\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
+. $commonscriptpath
+
+sleep 3
+#Start the cloudlabs agent service 
+CloudlabsManualAgent Start
+
+sleep 20
 Unregister-ScheduledTask -TaskName "Installdocker" -Confirm:$false 
 Restart-Computer -Force 
