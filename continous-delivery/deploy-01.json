@@ -220,11 +220,11 @@
             "settings": {
               "fileUris": [
                 "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
-                "https://experienceazure.blob.core.windows.net/templates/mcw-continuous-delivery-in-azure-devops/scripts/psscript03.ps1"
+                "https://raw.githubusercontent.com/shivashant25/ARM-templates/main/continous-delivery/psscript.ps1"
               ]
             },
             "protectedSettings": {
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy ByPass -File mcw-continuous-delivery-in-azure-devops/scripts/psscript03.ps1', variables('cloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy ByPass -File psscript.ps1', variables('cloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
             }
           }
         }
