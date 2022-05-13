@@ -110,7 +110,8 @@ $clonefiles = Get-Item -Path 'C:\Workspaces\lab\mcw-continuous-delivery-lab-file
 if(($app -ne $null) -and ($clonefiles -ne $null))
 {
     Write-Output "succeeded"
-    $Validstatus = 'Successfull'
+    $Validstatus = "Succeeded"
+    $Validmessage = "Validation Successfull"
 
 }
 else {
@@ -127,6 +128,6 @@ sleep 3
 #Start the cloudlabs agent service 
 CloudlabsManualAgent Start
 
-sleep 20
+sleep 5
 Unregister-ScheduledTask -TaskName "Installdocker" -Confirm:$false 
 Restart-Computer -Force 
