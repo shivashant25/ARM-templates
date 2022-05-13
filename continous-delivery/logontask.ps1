@@ -104,17 +104,35 @@ $path = "C:\Workspaces\lab\mcw-continuous-delivery-lab-files\infrastructure"
 
 sleep 20
 
-cd 'C:\LabFiles\'
-
-.\validate.ps1
-
 #Import Common Functions
 $commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.12\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
 . $commonscriptpath
 
+#check status of docker app installation aand cloned lab files
+$app = Get-Item -Path 'C:\Program Files\Docker\Docker\Docker Desktop.exe' 
+$clonefiles = Get-Item -Path 'C:\Workspaces\lab\mcw-continuous-delivery-lab-files'
+
+if(($app -ne $null) -and ($clonefiles -ne $null))
+{
+    Write-Output "succeeded"
+    $Validstatus = 'Successfull'
+
+}
+else {
+    Write-Warning "Validation Failed - see log output"
+    $Validstatus="Failed"  ##Failed or Successful at the last step
+    $Validmessage="PS script execution failed"
+      }
+
+sleep 3
+#Set the final deployment status
+CloudlabsManualAgent setStatus
+      
 sleep 3
 #Start the cloudlabs agent service 
 CloudlabsManualAgent Start
+
+Stop-Transcript
 
 sleep 20
 Unregister-ScheduledTask -TaskName "Installdocker" -Confirm:$false 
