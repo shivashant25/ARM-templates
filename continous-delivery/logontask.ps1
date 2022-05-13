@@ -111,7 +111,7 @@ if(($app -ne $null) -and ($clonefiles -ne $null))
 }
 else {
     Write-Warning "Validation Failed - see log output"
-    $validstatus = "Failed
+    $validstatus = "Failed"
       }
       
 Function SetDeploymentStatus($ManualStepStatus, $ManualStepMessage)
