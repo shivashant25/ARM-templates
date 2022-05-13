@@ -105,14 +105,12 @@ $commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension
 
 #check status of docker app installation aand cloned lab files
 $app = Get-Item -Path 'C:\Program Files\Docker\Docker\Docker Desktop.exe' 
-$clonefiles = Get-Item -Path 'C:\Workspaces\lab\mcw-continuous-delivery-lab-files'
+$clonefiles = Get-Item -Path 'C:\Workspaces\lab\mcw-continuous-delivery-lab-files\content-api'
 
 if(($app -ne $null) -and ($clonefiles -ne $null))
 {
     Write-Output "succeeded"
-    $Validstatus = "Succeeded"
-    $Validmessage = "Validation Successfull"
-
+    $Validstatus = 'succeeded'
 }
 else {
     Write-Warning "Validation Failed - see log output"
