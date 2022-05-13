@@ -41,6 +41,9 @@ $path=$path.Path
 $commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1"
 . $commonscriptpath
 
+#Use the commonfunction to install the required files for cloudlabsagent service 
+CloudlabsManualAgent Install
+
 # Run Imported functions from cloudlabs-windows-functions.ps1
 WindowsServerCommon
 InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
