@@ -11,11 +11,6 @@ Write-Host "Bypass-Execution-Policy"
 choco install docker-desktop --version=4.7.0
 Write-Host "Docker-install"
 
-#Installing PostgreSQL extension fro Azure Data Studio
-$WebClient = New-Object System.Net.WebClient
-$WebClient.DownloadFile("https://github.com/microsoft/azuredatastudio-postgresql/releases/download/v0.2.6/azuredatastudio-postgresql-0.2.6-win-x64.vsix","C:\Windows\System32\azuredatastudio-postgresql-0.2.6-win-x64.vsix")
-azuredatastudio --install-extension azuredatastudio-postgresql-0.2.6-win-x64.vsix 
-
 [Environment]::SetEnvironmentVariable("Path", $env:Path+";C:\Users\demouser\AppData\Roaming\npm\node_modules\azure-functions-core-tools\bin","User")
 
 
@@ -79,7 +74,7 @@ $body = "{
 $response = Invoke-RestMethod 'https://vsaex.dev.azure.com/aiw-devops/_apis/userentitlements?api-version=6.0-preview.3' -Method 'POST' -Headers $headers -Body $body
 $response | ConvertTo-Json
 
-
+#Download lab files
 cd C:\
 
 mkdir C:\Workspaces
@@ -131,8 +126,6 @@ CloudlabsManualAgent setStatus
 sleep 3
 #Start the cloudlabs agent service 
 CloudlabsManualAgent Start
-
-Stop-Transcript
 
 sleep 20
 Unregister-ScheduledTask -TaskName "Installdocker" -Confirm:$false 
