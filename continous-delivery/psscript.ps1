@@ -102,8 +102,5 @@ $Action= New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell
 Register-ScheduledTask -TaskName "Installdocker" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force
 
 
-
-
-
 Stop-Transcript
 Restart-Computer -Force 
