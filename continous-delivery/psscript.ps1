@@ -78,7 +78,7 @@ $WebClient = New-Object System.Net.WebClient
 $WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/innovate-and-modernize-apps-with-data-and-ai/scripts/extensions.bat","C:\Packages\extensions.bat")
 
 $WebClient = New-Object System.Net.WebClient
-$WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/mcw-continuous-delivery-in-azure-devops/scripts/logontask03.ps1","C:\Packages\logontask.ps1")
+$WebClient.DownloadFile("https://raw.githubusercontent.com/shivashant25/ARM-templates/main/continous-delivery/logontask.ps1","C:\Packages\logontask.ps1")
 
 
 
