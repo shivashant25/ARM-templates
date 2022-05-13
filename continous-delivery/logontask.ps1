@@ -8,6 +8,8 @@ $DeploymentID = $env:DeploymentID
 Start-Process C:\Packages\extensions.bat
 Write-Host "Bypass-Execution-Policy" 
 
+choco install docker-desktop --version=4.7.0
+Write-Host "Docker-install"
 
 [Environment]::SetEnvironmentVariable("Path", $env:Path+";C:\Users\demouser\AppData\Roaming\npm\node_modules\azure-functions-core-tools\bin","User")
 
