@@ -107,7 +107,7 @@ if(($app -ne $null) -and ($clonefiles -ne $null))
 {
     Write-Information "Validation Passed"
     
-    $validstatus = "Successfull
+    $validstatus = "Successfull"
 }
 else {
     Write-Warning "Validation Failed - see log output"
