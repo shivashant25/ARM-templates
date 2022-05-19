@@ -76,9 +76,9 @@
     "subnetPrefix": "176.16.0.0/24",
 
     "webCustomScriptFileName": "configure-webvm.ps1",
-    "webCustomScriptUri": "[concat('https://raw.githubusercontent.com/CloudLabs-MCW/MCW-App-modernization/', variables('githubBranchName'),'/Hands-on%20lab/lab-files/ARM-template/', variables('webCustomScriptFileName'))]",
+    "webCustomScriptUri": "[concat('https://raw.githubusercontent.com/shivashant25/MCW-App-modernization/', variables('githubBranchName'),'/Hands-on%20lab/lab-files/ARM-template/', variables('webCustomScriptFileName'))]",
     "sqlCustomScriptFileName": "configure-sqlvm.ps1",
-    "sqlCustomScriptUri": "[concat('https://raw.githubusercontent.com/CloudLabs-MCW/MCW-App-modernization/', variables('githubBranchName'),'/Hands-on%20lab/lab-files/ARM-template/', variables('sqlCustomScriptFileName'))]",
+    "sqlCustomScriptUri": "[concat('https://raw.githubusercontent.com/shivashant25/MCW-App-modernization/', variables('githubBranchName'),'/Hands-on%20lab/lab-files/ARM-template/', variables('sqlCustomScriptFileName'))]",
     "dmsName": "[concat('parts-dms-', parameters('DeploymentID'))]",
     "hostingPlanName": "[concat(resourceGroup().name, '-asp-ln-fn')]",
     "functionAppName": "[concat('parts-func-', parameters('DeploymentID'))]",
