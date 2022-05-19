@@ -1,0 +1,37 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerName": {
+      "value": "parts"
+    },
+    "adminUsername": {
+      "value": "demouser"
+    },
+    "adminPassword": {
+      "value": "Password.1!!"
+    },
+    "AzureUserName": {
+      "value": "GET-AZUSER-UPN"
+    },
+    "AzurePassword": {
+      "value": "GET-AZUSER-PASSWORD"
+    },
+    "ODLID": {
+      "value": "GET-ODL-ID"
+    },
+    "InstallCloudLabsShadow": {
+      "value": "yes"
+    },
+    "DeploymentID": {
+      "value": "GET-DEPLOYMENT-ID"
+    },
+    "azsubscriptionid": {
+      "value": "GET-SUBSCRIPTION-ID"
+    },
+    "aztenantid": {
+      "value": "GET-TENANT-ID"
+    }
+  }
+}
+  
