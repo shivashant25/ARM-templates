@@ -5,7 +5,7 @@
     "DeploymentID": {
       "value": "GET-DEPLOYMENT-ID"
     },
-    "SubscriptionID": {
+    "SubID": {
       "value": "GET-SUBSCRIPTION-GUID"
     }
   }
