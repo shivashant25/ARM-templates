@@ -355,7 +355,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2017-05-10",
       "name": "fabrikamdeploy-project",
       "dependsOn": [
         "[concat('Microsoft.DevCenter/devcenters/', variables('devcentername'))]"
@@ -380,7 +380,7 @@
           ]
         }
       },
-      "subscriptionId": "[variables('SubID')]",
+      "subscriptionId": "[parameters('SubscriptionID')]",
       "resourceGroup": "[variables('rgname')]"
     }
   ]
