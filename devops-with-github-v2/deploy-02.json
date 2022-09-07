@@ -5,7 +5,7 @@
     "DeploymentID": {
       "type": "string"
     },
-    "SubscriptionID": {
+    "SubID": {
       "type": "string"
     }
   },
@@ -380,7 +380,7 @@
           ]
         }
       },
-      "subscriptionId": "[parameters('SubscriptionID')]",
+      "subscriptionId": "[parameters('SubID')]",
       "resourceGroup": "[variables('rgname')]"
     }
   ]
