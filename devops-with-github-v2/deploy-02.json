@@ -4,29 +4,26 @@
   "parameters": {
     "DeploymentID": {
       "type": "string"
-    },
-    "SubID": {
-      "type": "string"
     }
   },
   "variables": {
+    "SubID": "[subscription().subscriptionId]",
     "Webappname": "[concat('fabmedical-web-',parameters('DeploymentID'))]",
     "Appserviceplanname": "[concat('fabmedical-plan-',parameters('DeploymentID'))]",
     "Cosmosdbname": "[concat('fabmedical-cdb-',parameters('DeploymentID'))]",
     "publishingUsername": "[concat('$',parameters('DeploymentID'))]",
     "location": "[resourceGroup().location]",
     "loadtestname": "[concat('fabmedical-loadtest-',parameters('DeploymentID'))]",
-    "SubID": "[parameters('SubscriptionID')]",
     "projectname": "[concat('devproject-',parameters('DeploymentID'))]",
     "rgname": "[concat('fabmedical-',parameters('DeploymentID'))]",
-    "devCenterId": "[concat('/subscriptions/',variables('SubID'),'/resourceGroups/',variables('rgname'),'/providers/Microsoft.DevCenter/devcenters/',variables('devcentername'))]",
+    "devCenterId": "[resourceId(resourceGroup().name,'/providers/Microsoft.DevCenter/devcenters/',variables('devcentername'))]",
     "devcentername": "[concat('devcenter-',parameters('DeploymentID'))]",
     "devboxvnet": "devboxvnet",
     "devboxsubnet": "devboxsubnet",
     "subnetPrefix": "10.1.0.0/24",
     "addressPrefix": "10.1.0.0/16",
     "netconnectionname": "fabrikam-connection",
-    "devboxsubnetid": "[concat('/subscriptions/',variables('SubID'),'/resourceGroups/',variables('rgname'),'/providers/Microsoft.Network/virtualNetworks/',variables('devboxvnet'),'/subnets/',variables('devboxsubnet'))]"
+    "devboxsubnetid": "[resourceId(resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/',variables('devboxvnet'),'/subnets/',variables('devboxsubnet'))]"
   },
   "resources": [
     {
@@ -380,7 +377,7 @@
           ]
         }
       },
-      "subscriptionId": "[parameters('SubID')]",
+      "subscriptionId": "[variables('SubID')]",
       "resourceGroup": "[variables('rgname')]"
     }
   ]
