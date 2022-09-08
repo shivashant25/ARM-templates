@@ -15,7 +15,7 @@
     "location": "[resourceGroup().location]",
     "loadtestname": "[concat('fabmedical-loadtest-',parameters('DeploymentID'))]",
     "projectname": "[concat('devproject-',parameters('DeploymentID'))]",
-    "rgname": "[concat('fabmedical-',parameters('DeploymentID'))]",
+    "rgname": "[resourceGroup().name]",
     "devCenterId": "[resourceId(resourceGroup().name,'Microsoft.DevCenter/devcenters',variables('devcentername'))]",
     "devcentername": "[concat('devcenter-',parameters('DeploymentID'))]",
     "devboxvnet": "devboxvnet",
