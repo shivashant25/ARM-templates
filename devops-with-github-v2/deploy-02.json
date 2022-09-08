@@ -16,14 +16,15 @@
     "loadtestname": "[concat('fabmedical-loadtest-',parameters('DeploymentID'))]",
     "projectname": "[concat('devproject-',parameters('DeploymentID'))]",
     "rgname": "[concat('fabmedical-',parameters('DeploymentID'))]",
-    "devCenterId": "[resourceId(resourceGroup().name,'/providers/Microsoft.DevCenter/devcenters/',variables('devcentername'))]",
+    "devCenterId": "[resourceId(resourceGroup().name,'Microsoft.DevCenter/devcenters',variables('devcentername'))]",
     "devcentername": "[concat('devcenter-',parameters('DeploymentID'))]",
     "devboxvnet": "devboxvnet",
     "devboxsubnet": "devboxsubnet",
     "subnetPrefix": "10.1.0.0/24",
     "addressPrefix": "10.1.0.0/16",
     "netconnectionname": "fabrikam-connection",
-    "devboxsubnetid": "[resourceId(resourceGroup().name,'/providers/Microsoft.Network/virtualNetworks/',variables('devboxvnet'),'/subnets/',variables('devboxsubnet'))]"
+    "vnetId1": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', variables('devboxvnet'))]",	
+    "devboxsubnetid": "[concat(variables('vnetId1'), '/subnets/', variables('devboxsubnet'))]"
   },
   "resources": [
     {
@@ -352,7 +353,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-04-01",
+      "apiVersion": "2022-09-01",
       "name": "fabrikamdeploy-project",
       "dependsOn": [
         "[concat('Microsoft.DevCenter/devcenters/', variables('devcentername'))]"
