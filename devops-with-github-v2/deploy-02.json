@@ -353,7 +353,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2022-08-01-preview",
       "name": "fabrikamdeploy-project",
       "dependsOn": [
         "[concat('Microsoft.DevCenter/devcenters/', variables('devcentername'))]"
