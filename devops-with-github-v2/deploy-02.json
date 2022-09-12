@@ -367,7 +367,7 @@
           "variables": {},
           "resources": [
             {
-              "apiVersion": "2022-08-01-preview",
+              "apiVersion": "2017-05-10",
               "name": "[variables('projectname')]",
               "location": "[variables('location')]",
               "type": "Microsoft.DevCenter/projects",
