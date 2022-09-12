@@ -1,7 +1,6 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "apiProfile": "2018-03-01-hybrid",
   "parameters": {
     "DeploymentID": {
       "type": "string"
@@ -24,13 +23,14 @@
     "subnetPrefix": "10.1.0.0/24",
     "addressPrefix": "10.1.0.0/16",
     "netconnectionname": "fabrikam-connection",
-    "vnetId1": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', variables('devboxvnet'))]",
+    "vnetId1": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', variables('devboxvnet'))]",	
     "devboxsubnetid": "[concat(variables('vnetId1'), '/subnets/', variables('devboxsubnet'))]"
   },
   "resources": [
     {
       "type": "Microsoft.DocumentDB/databaseAccounts",
-       "name": "[variables('Cosmosdbname')]",
+      "apiVersion": "2022-02-15-preview",
+      "name": "[variables('Cosmosdbname')]",
       "location": "[variables('location')]",
       "tags": {
       },
@@ -99,6 +99,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2021-03-01",
       "name": "[variables('Appserviceplanname')]",
       "location": "[variables('location')]",
       "tags": {
@@ -126,6 +127,7 @@
     },
     {
       "type": "Microsoft.Web/sites",
+      "apiVersion": "2021-03-01",
       "name": "[variables('Webappname')]",
       "location": "[variables('location')]",
       "dependsOn": [
@@ -177,6 +179,7 @@
     },
     {
       "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2021-03-01",
       "name": "[concat(variables('Webappname'), '/ftp')]",
       "location": "[variables('location')]",
       "dependsOn": [
@@ -204,6 +207,7 @@
     },
     {
       "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2021-03-01",
       "name": "[concat(variables('Webappname'), '/web')]",
       "location": "[variables('location')]",
       "dependsOn": [
@@ -286,6 +290,7 @@
     },
     {
       "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2021-03-01",
       "name": "[concat(variables('Webappname'), '/', variables('Webappname'), '.azurewebsites.net')]",
       "location": "[variables('location')]",
       "dependsOn": [
@@ -304,6 +309,7 @@
     },
     {
       "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2017-04-01",
       "name": "[variables('devboxvnet')]",
       "location": "[variables('location')]",
       "properties": {
@@ -324,6 +330,7 @@
     },
     {
       "type": "Microsoft.DevCenter/devcenters",
+      "apiVersion": "2022-08-01-preview",
       "name": "[variables('devcentername')]",
       "location": "[variables('location')]",
       "identity": {
@@ -332,6 +339,7 @@
     },
     {
       "type": "Microsoft.DevCenter/networkconnections",
+      "apiVersion": "2022-08-01-preview",
       "name": "[variables('netconnectionname')]",
       "dependsOn": [
         "[concat('Microsoft.Network/virtualNetworks/', variables('devboxvnet'))]"
@@ -345,6 +353,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
       "name": "fabrikamdeploy-project",
       "dependsOn": [
         "[concat('Microsoft.DevCenter/devcenters/', variables('devcentername'))]"
@@ -354,12 +363,11 @@
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
-          "apiProfile": "2018-03-01-hybrid",
           "parameters": {},
           "variables": {
             "location": "[variables('location')]",
             "projectname": "[variables('projectname')]",
-            "devCenterId": "[variables('devCenterId')]",
+            "devCenterId": "[variables('devCenterId')]"
           },
           "resources": [
             {
