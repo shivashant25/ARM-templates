@@ -360,8 +360,6 @@
             "location": "[variables('location')]",
             "projectname": "[variables('projectname')]",
             "devCenterId": "[variables('devCenterId')]",
-            "subscriptionId": "[variables('SubID')]",
-            "resourceGroup": "[variables('rgname')]"
           },
           "resources": [
             {
@@ -374,7 +372,6 @@
               }
             }
           ]
-
         }
       }
     }
