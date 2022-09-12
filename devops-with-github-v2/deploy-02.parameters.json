@@ -4,9 +4,6 @@
   "parameters": {
     "DeploymentID": {
       "value": "GET-DEPLOYMENT-ID"
-    },
-    "SubID": {
-      "value": "GET-SUBSCRIPTION-GUID"
     }
   }
 }
