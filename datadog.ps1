@@ -15,7 +15,7 @@ refreshenv
 
 mkdir C:\BicepTemplates
 cd C:\BicepTemplates
-git clone --branch xxx-DatadogOnAzure "https://github.com/jrzyshr/WhatTheHack.git"
+git clone --branch xxx-DatadogOnAzure "https://github.com/sumitmalik51/WhatTheHack.git"
 
 cd WhatTheHack
 cd 059-DatadogOnAzure
