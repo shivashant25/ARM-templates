@@ -217,12 +217,12 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "https://experienceazure.blob.core.windows.net/templates/cloud-adoption-framework/scripts/psscript.ps1",
+            "https://raw.githubusercontent.com/shivashant25/ARM-templates/main/CAF/psscript.ps1",
             "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1"
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File cloud-adoption-framework/scripts/psscript.ps1', ' ', parameters('OBJECTID'), ' ', variables('cloudlabscommon'), variables('Enable-CloudLabsEmbeddedShadow') )]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File psscript.ps1', ' ', parameters('OBJECTID'), ' ', variables('cloudlabscommon'), variables('Enable-CloudLabsEmbeddedShadow') )]"
         }
       }
     },
