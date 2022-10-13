@@ -52,7 +52,6 @@ CloudlabsManualAgent Install
 
 # Run Imported functions from cloudlabs-windows-functions.ps1
 WindowsServerCommon
-InstallAzPowerShellModule
 #InstallAzCLI
 #InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
 Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
