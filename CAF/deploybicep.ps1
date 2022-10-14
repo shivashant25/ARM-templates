@@ -1,6 +1,10 @@
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
 Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsLogOnTask.txt -Append
 
+cd C:\BicepTemplates
+
+git clone --branch main https://github.com/shivashant25/eslz-bicep.git
+
 
 . C:\LabFiles\AzureCreds.ps1
 
