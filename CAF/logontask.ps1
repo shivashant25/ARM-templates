@@ -110,7 +110,7 @@ Disconnect-AzAccount
 #    Write-Warning "Validation Failed - see log output"
  #   $Validstatus="Failed"  ##Failed or Successful at the last step
 #    $Validmessage="Owner role assignment for object id failed"
-      }
+      #}
 
 
 #CloudlabsManualAgent setStatus
