@@ -13,7 +13,7 @@ $commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension
 
 
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
-Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsLogOnTask.txt -Append
+Start-Transcript -Path C:\WindowsAzure\Logs\deploybicep.txt -Append
 
 cd C:\BicepTemplates
 
