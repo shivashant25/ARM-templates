@@ -69,6 +69,8 @@ Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultUsername" -Value "$($env:
 Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "Password.1!!" -type String
 Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
 
+$FileDir ="C:\LabFiles"
+
 # Scheduled Task
 $Trigger= New-ScheduledTaskTrigger -AtLogOn
 $User= "$($env:ComputerName)\demouser" 
