@@ -70,7 +70,7 @@ $WebClient = New-Object System.Net.WebClient
 $WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/cloud-adoption-framework/files/vnetdmz-deploy.json","C:\LabFiles\vnetdmz-deploy.json")
 
 $WebClient = New-Object System.Net.WebClient
-$WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates/cloud-adoption-framework/scripts/logontask.ps1","C:\LabFiles\logontask.ps1")
+$WebClient.DownloadFile("https://raw.githubusercontent.com/shivashant25/ARM-templates/main/CAF/logontask.ps1","C:\LabFiles\logontask.ps1")
 
 $WebClient = New-Object System.Net.WebClient
 $WebClient.DownloadFile("https://raw.githubusercontent.com/shivashant25/ARM-templates/main/CAF/deploybicep.ps1","C:\LabFiles\deploybicep.ps1")
