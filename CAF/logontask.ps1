@@ -117,3 +117,8 @@ Disconnect-AzAccount
 
 sleep 5
 Unregister-ScheduledTask -TaskName "Setup" -Confirm:$false
+
+
+Start-ScheduledTask -TaskName "Setup1"
+
+
