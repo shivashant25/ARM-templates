@@ -8,7 +8,7 @@ az login --username "$userName" --password "$password"
 az role assignment create  --scope '/' --role 'owner' --assignee $AzureUserName 
 
 #Import Common Functions
-$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.12\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
+$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.12\Downloads\0\cloudlabs-common\cloudlabs-windows-deploybicep.ps1"
 . $commonscriptpath
 
 
