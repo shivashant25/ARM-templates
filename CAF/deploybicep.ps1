@@ -8,7 +8,7 @@ az login --username "$userName" --password "$password"
 az role assignment create  --scope '/' --role 'owner' --assignee $AzureUserName 
 
 #Import Common Functions
-$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.12\Downloads\0\cloudlabs-common\cloudlabs-windows-deploybicep.ps1"
+$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.12\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
 . $commonscriptpath
 
 
@@ -44,7 +44,7 @@ refreshenv
 $mgmttemplate = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\managementGroups"
 $mgmtparameters = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\managementGroups\parameters"
 
-New-AzTenantDeployment -TemplateFile "$mgmttemplate\managementGroups.bicep" -TemplateParameterFile "$mgmtparameters\managementGroups.parameters.all.json" -Location "centralus" 
+New-AzTenantDeployment -Name "Managment1" -TemplateFile "$mgmttemplate\managementGroups.bicep" -TemplateParameterFile "$mgmtparameters\managementGroups.parameters.all.json" -Location "centralus" 
 
 
 
@@ -52,11 +52,7 @@ New-AzTenantDeployment -TemplateFile "$mgmttemplate\managementGroups.bicep" -Tem
 $cpdtemplate = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\policy\definitions"
 $cpdparameters = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\policy\definitions\parameters"
 
-New-AzManagementGroupDeployment `
-  -TemplateFile "$cpdtemplate\customPolicyDefinitions.bicep" `
-  -TemplateParameterFile "$cpdparameters\customPolicyDefinitions.parameters.all.json" `
-  -Location "centralus" `
-  -ManagementGroupId eslz
+New-AzManagementGroupDeployment -Name "Managment2" -TemplateFile "$cpdtemplate\customPolicyDefinitions.bicep" -TemplateParameterFile "$cpdparameters\customPolicyDefinitions.parameters.all.json" -Location "centralus" -ManagementGroupId eslz
 
 
 
@@ -64,11 +60,7 @@ New-AzManagementGroupDeployment `
 $rbactemplate = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\customRoleDefinitions"
 $rbacparameters = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\customRoleDefinitions\parameters"
 
-New-AzManagementGroupDeployment `
-  -TemplateFile "$rbactemplate\customRoleDefinitions.bicep" `
-  -TemplateParameterFile "$rbacparameters\customRoleDefinitions.parameters.all.json" `
-  -Location centralus `
-  -ManagementGroupId eslz  
+New-AzManagementGroupDeployment -Name "Managment3" -TemplateFile "$rbactemplate\customRoleDefinitions.bicep" -TemplateParameterFile "$rbacparameters\customRoleDefinitions.parameters.all.json" -Location centralus -ManagementGroupId eslz  
 
 
 
@@ -91,10 +83,7 @@ New-AzResourceGroup `
 $logtemplate = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\logging"
 $logparameters = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\logging\parameters"
 
-New-AzResourceGroupDeployment `
-  -TemplateFile "$logtemplate\logging.bicep" `
-  -TemplateParameterFile "$logparameters\logging.parameters.all.json" `
-  -ResourceGroup eslz-mgmt
+New-AzResourceGroupDeployment -Name "RG1" -TemplateFile "$logtemplate\logging.bicep" -TemplateParameterFile "$logparameters\logging.parameters.all.json" -ResourceGroup eslz-mgmt
 
 
 
@@ -114,11 +103,7 @@ $nettemplate = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\hubNetw
 $netparameters = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\/hubNetworking\parameters"
 
   
-New-AzResourceGroupDeployment `
-  -TemplateFile "$nettemplate\hubNetworking.bicep" `
-  -TemplateParameterFile "$netparameters\hubNetworking.parameters.all.json" `
-  -ResourceGroupName 'eslz_Hub_Networking'
-
+New-AzResourceGroupDeployment -Name "RG2" -TemplateFile "$nettemplate\hubNetworking.bicep" -TemplateParameterFile "$netparameters\hubNetworking.parameters.all.json" -ResourceGroupName 'eslz_Hub_Networking'
 
 #Replacing connectivity Sub ID and Hub Vnet ResourceId in parameters file
 
@@ -141,6 +126,7 @@ $hpstemplate = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\orchestration\h
 $hpsparameters = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\orchestration\hubPeeredSpoke\parameters"
 
 New-AzManagementGroupDeployment `
+  -Name "Managment4" `
   -TemplateFile "$hpstemplate\hubPeeredSpoke.bicep" `
   -TemplateParameterFile "$hpsparameters\hubPeeredSpoke.parameters.all.json" `
   -Location centralus `
@@ -163,6 +149,7 @@ $ratemplate = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\roleAssi
 $raparameters = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\roleAssignments\parameters"
 
 New-AzManagementGroupDeployment `
+  -Name "Managment5" `
   -TemplateFile "$ratemplate\roleAssignmentManagementGroup.bicep" `
   -TemplateParameterFile "$raparameters\roleAssignmentManagementGroup.servicePrincipal.parameters.all.json" `
   -ManagementGroupId eslz-platform `
@@ -194,6 +181,7 @@ $subtemplate = "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\orchestration\s
 
 # For Azure global regions
 New-AzManagementGroupDeployment `
+   -Name "Managment6" `
   -TemplateFile "$subtemplate\subPlacementAll.bicep" `
   -TemplateParameterFile "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\orchestration\subPlacementAll\parameters\subPlacementAll.parameters.all.json" `
   -Location centralus `
@@ -218,13 +206,43 @@ $loganalyticsid= (Get-AzResource -ResourceGroupName "eslz-mgmt" -ResourceType "M
 
 # For Azure global regions
 New-AzManagementGroupDeployment `
+  -Name "Managment6" `
   -TemplateFile "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\policy\assignments\alzDefaults\alzDefaultPolicyAssignments.bicep" `
   -TemplateParameterFile "C:\BicepTemplates\eslz-bicep\infra-as-code\bicep\modules\policy\assignments\alzDefaults\parameters\alzDefaultPolicyAssignments.parameters.all.json" `
   -Location centralus `
   -ManagementGroupId eslz
+
+  $Managment2 = Get-AzManagementGroupDeployment -Name Managment2 -ManagementGroupId eslz
+  $Managment3 = Get-AzManagementGroupDeployment -Name Managment3 -ManagementGroupId eslz
+  $Managment4 = Get-AzManagementGroupDeployment -Name Managment4 -ManagementGroupId eslz
+  $Managment5 = Get-AzManagementGroupDeployment -Name Managment5 -ManagementGroupId eslz-platform 
+  $Managment6 = Get-AzManagementGroupDeployment -Name Managment6 -ManagementGroupId eslz
+    Select-AzSubscription -Subscription $ManagementSubscriptionId
+
+  $RG1 = Get-AzResourceGroupDeployment -Name "RG1" -ResourceGroupName 'eslz-mgmt'
+  Select-AzSubscription -Subscription $ConnectivitySubscriptionId 
+  $RG2 = Get-AzResourceGroupDeployment -Name "RG2" -ResourceGroupName 'eslz_Hub_Networking'
+  $Managment2 = $Managment2.ProvisioningState
+  $Managment3 = $Managment3.ProvisioningState
+  $Managment4 = $Managment4.ProvisioningState
+  $Managment5 = $Managment5.ProvisioningState
+  $Managment6 = $Managment6.ProvisioningState
+  $RG1 = $RG1.ProvisioningState
+  $RG2 = $RG2.ProvisioningState
+
+
+
+  if ($Managment2 -eq "Succeeded" -and $Managment3 -eq "Succeeded" -and $Managment4 -eq "Succeeded"-and $Managment5 -eq "Succeeded"-and $Managment6 -eq "Succeeded"-and $RG1 -eq "Succeeded"-and $RG2 -eq "Succeeded")
+  {
   
-  
-  $status = (Get-AzRoleAssignment -Scope '/' -RoleDefinitionName "Owner"-SignInName $AzureUserName)
+    $status = "Succeeded"
+  }
+  else
+  {
+  $status = $null
+  }
+
+
 $status
 if ($status -ne $null)
 {
@@ -246,4 +264,3 @@ CloudlabsManualAgent setStatus
 
 sleep 5
 Unregister-ScheduledTask -TaskName "Setup1" -Confirm:$false
-
