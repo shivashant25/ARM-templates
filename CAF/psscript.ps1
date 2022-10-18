@@ -151,6 +151,8 @@ Register-ScheduledTask -TaskName "Setup" -Trigger $Trigger -User $User -Action $
 
 #sleep 300
 
+$Validstatus="Pending"  ##Failed or Successful at the last step
+$Validmessage="Post Deployment is Pending"
 CloudlabsManualAgent Start
 
 Restart-Computer -Force
