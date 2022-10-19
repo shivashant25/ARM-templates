@@ -137,22 +137,8 @@ $User= "$($env:ComputerName)\demouser"
 $Action= New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File $FileDir\logontask.ps1"
 Register-ScheduledTask -TaskName "Setup" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force 
 
-
-#Connect-AzureAD -Credential $cred | Out-Null
-
-#az login --username "$userName" --password "$password"
-
-
-#New-AzRoleAssignment -Scope '/' -RoleDefinitionName 'Owner' -ObjectId $OBJECTID
-
-#sleep 300
-
-#az role assignment create  --scope '/' --role 'owner' --assignee $AzureUserName 
-
-#sleep 300
-
 $Validstatus="Pending"  ##Failed or Successful at the last step
 $Validmessage="Post Deployment is Pending"
-CloudlabsManualAgent Start
+CloudlabsManualAgent setStatus
 
 Restart-Computer -Force
