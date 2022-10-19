@@ -124,11 +124,13 @@ cd C:\BicepTemplates
 
 git clone --branch main https://github.com/shivashant25/eslz-bicep.git
 
+$Pass = "$adminPassword"
+
 #Enable Autologon
 $AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
 Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoAdminLogon" -Value "1" -type String 
 Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultUsername" -Value "$($env:ComputerName)\demouser" -type String  
-Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "$adminPassword" -type String
+Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "$Pass" -type String
 Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
 
 # Scheduled Task
