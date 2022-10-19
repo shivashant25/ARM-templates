@@ -8,7 +8,6 @@ $password = $AzurePassword
 
 az login --username "$userName" --password "$password"
 
-
 refreshenv
 sleep 2
 az rest --method post --url "/providers/Microsoft.Authorization/elevateAccess?api-version=2016-07-01"
@@ -21,8 +20,6 @@ az login --username "$userName" --password "$password"
 
 refreshenv
 az role assignment create  --scope '/' --role 'owner' --assignee $userName 
-
-
 
 function validateroleassignment{
                        
@@ -77,48 +74,9 @@ $User= "$($env:ComputerName)\demouser"
 $Action= New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File $FileDir\deploybicep.ps1"
 Register-ScheduledTask -TaskName "Setup1" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force 
 
-
 Disconnect-AzAccount
-
-#sleep 600
-
-#. C:\LabFiles\AzureCreds.ps1
-
-#$userName = $AzureUserName
-#$password = $AzurePassword
-
-#az login --username "$userName" --password "$password"
-
-#az role assignment create  --scope '/' --role 'owner' --assignee $AzureUserName 
-
-#Import Common Functions
-#$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.12\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
-#. $commonscriptpath
-
-#$status = (Get-AzRoleAssignment -Scope '/' -RoleDefinitionName "Owner"-SignInName $AzureUserName)
-#$status
-#if ($status -ne $null)
-#{
- 
-#    $Validstatus="Succeeded"  ##Failed or Successful at the last step
-#   $Validmessage="Role assignment succeeded"
-
-
-
-#}
-#else {
-#    Write-Warning "Validation Failed - see log output"
- #   $Validstatus="Failed"  ##Failed or Successful at the last step
-#    $Validmessage="Owner role assignment for object id failed"
-      #}
-
-
-#CloudlabsManualAgent setStatus
 
 sleep 5
 Unregister-ScheduledTask -TaskName "Setup" -Confirm:$false
 
-
 Start-ScheduledTask -TaskName "Setup1"
-
-
