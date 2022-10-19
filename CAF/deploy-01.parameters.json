@@ -6,7 +6,7 @@
       "value": "demouser"
     },
     "adminPassword": {
-      "value": "GEN-PASSWORD"
+      "value": "GET-AZUSER-PASSWORD"
     },
     "AzureUserName": {
       "value": "GET-AZUSER-UPN"
