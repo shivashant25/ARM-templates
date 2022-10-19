@@ -124,7 +124,7 @@ cd C:\BicepTemplates
 
 git clone --branch main https://github.com/shivashant25/eslz-bicep.git
 
-$Pass = $adminPassword
+$Pass = $AzurePassword
 
 #Enable Autologon
 $AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
