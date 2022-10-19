@@ -262,5 +262,10 @@ else {
 
 CloudlabsManualAgent setStatus
 
+#Start the cloudlabs agent service 
+CloudlabsManualAgent Start
+
+Stop-Transcript
+
 sleep 5
 Unregister-ScheduledTask -TaskName "Setup1" -Confirm:$false
