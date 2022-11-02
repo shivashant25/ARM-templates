@@ -248,7 +248,7 @@ if ($status -ne $null)
 {
  
     $Validstatus="Succeeded"  ##Failed or Successful at the last step
-   $Validmessage="Role assignment succeeded"
+   $Validmessage="Management level deployments are succeeded"
 
 
 
@@ -256,7 +256,7 @@ if ($status -ne $null)
 else {
     Write-Warning "Validation Failed - see log output"
     $Validstatus="Failed"  ##Failed or Successful at the last step
-    $Validmessage="Owner role assignment for object id failed"
+    $Validmessage="Management level deployments failed after root level role assignment"
       }
 
 
