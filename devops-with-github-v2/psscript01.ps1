@@ -52,15 +52,6 @@ WindowsServerCommon
 InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
 CreateCredFile $AzureUserName $AzurePassword $AzureTenantID $AzureSubscriptionID $DeploymentID $azuserobjectid
 InstallChocolatey
-InstallVSCode
-choco install dotnetcore-sdk
-choco install azure-functions-core-tools
-InstallAzCLI
-
-sleep 10
-
-#Install synapse modules
-Install-PackageProvider NuGet -Force
 
 sleep 10
 
@@ -69,15 +60,67 @@ Import-Module -Name VSTeam -Force
 
 #installing extensions to vscode
 code --install-extension ms-dotnettools.csharp 
-code --install-extension vsciot-vscode.azure-iot-tools
-code --install-extension ms-azuretools.vscode-azurefunctions
 
 sleep  10
 
 #Assign Packages to Install
 choco install vscode
+choco install dotnet-6.0-sdk
+choco install azure-cli
+
+sleep  10
+
+#Install nodejs v16.8.0
+$WebClient = New-Object System.Net.WebClient
+$WebClient.DownloadFile("https://nodejs.org/download/release/v16.8.0/node-v16.8.0-x64.msi","C:\LabFiles\node-v16.8.0-x64.msi")
+
+sleep 5
+
+msiexec.exe /i "C:\LabFiles\node-v16.8.0-x64.msi" /qn ALLUSERS=2 MSIINSTALLPERUSER=1
+
+sleep 5
+
+#install AZ-module latest version
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+Install-Module -Name Az -Force
+
+#Az Login
+
+. C:\LabFiles\AzureCreds.ps1
+
+$userName = $AzureUserName
+$password = $AzurePassword
+$subscriptionId = $AzureSubscriptionID
+$TenantID = $AzureTenantID
+
+
+$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
+$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
+
+Connect-AzAccount -Credential $cred | Out-Null
+
+$Inputstring = $AzureUserName
+$CharArray =$InputString.Split("@")
+$CharArray[1]
+$tenantName = $CharArray[1]
+
+#install git
 choco install git
-choco install nodejs.install
+
+#install bicep module
+choco install bicep
+
+#create directory and clone bicep templates
+
+mkdir C:\Workspaces
+cd C:\Workspaces
+mkdir lab
+cd lab
+
+git clone --branch main https://github.com/shivashant25/aiw-devops-with-github-lab-files.git
 
 sleep 5
 
@@ -87,8 +130,6 @@ $WebClient.DownloadFile("https://experienceazure.blob.core.windows.net/templates
 
 $WebClient = New-Object System.Net.WebClient
 $WebClient.DownloadFile("https://raw.githubusercontent.com/shivashant25/ARM-templates/main/devops-with-github-v2/logontask01.ps1","C:\Packages\logontask.ps1")
-
-
 
 sleep 5
 
