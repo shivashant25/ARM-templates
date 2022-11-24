@@ -84,25 +84,49 @@ $response | ConvertTo-Json
 #Download lab files
 cd C:\
 
+#create directory and clone bicep templates
+
 mkdir C:\Workspaces
 cd C:\Workspaces
 mkdir lab
 cd lab
 
-git clone --branch stage https://github.com/CloudLabs-MCW/MCW-Continuous-delivery-in-Azure-DevOps
+mkdir aiw-devops-with-github-lab-files
+cd aiw-devops-with-github-lab-files
 
-mkdir mcw-continuous-delivery-lab-files
-cd mcw-continuous-delivery-lab-files
-
-Copy-Item '..\mcw-continuous-delivery-in-azure-devops\Hands-on lab\lab-files\*' -Destination ./ -Recurse
+git clone --branch main https://github.com/shivashant25/aiw-devops-with-github-lab-files.git
 
 Sleep 5
-$path = "C:\Workspaces\lab\mcw-continuous-delivery-lab-files\infrastructure"
-(Get-Content -Path "$path\deploy-webapp.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\deploy-webapp.ps1"
-(Get-Content -Path "$path\configure-webapp.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\configure-webapp.ps1"
-(Get-Content -Path "$path\deploy-appinsights.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\deploy-appinsights.ps1"
-(Get-Content -Path "$path\deploy-infrastructure.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\deploy-infrastructure.ps1"
-(Get-Content -Path "$path\seed-cosmosdb.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\seed-cosmosdb.ps1"
+
+$path = "C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac"
+(Get-Content -Path "$path\createResources.parameters.json") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\createResources.parameters.json"
+#(Get-Content -Path "$path\configure-webapp.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\configure-webapp.ps1"
+#(Get-Content -Path "$path\deploy-appinsights.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\deploy-appinsights.ps1"
+#(Get-Content -Path "$path\deploy-infrastructure.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\deploy-infrastructure.ps1"
+#(Get-Content -Path "$path\seed-cosmosdb.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\seed-cosmosdb.ps1"
+
+Sleep 5
+
+. C:\LabFiles\AzureCreds.ps1
+
+$userName = $AzureUserName
+$password = $AzurePassword
+$subscriptionId = $AzureSubscriptionID
+$TenantID = $AzureTenantID
+
+
+$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
+$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
+
+Connect-AzAccount -Credential $cred | Out-Null
+
+
+cd C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac
+
+$RGname=contoso-traders-$deploymentid
+
+New-AzResourceGroupDeployment -Name "createresources" -TemplateFile "createResources.bicep" -TemplateParameterFile "createResources.parameters.json" -ResourceGroup $RGname
+
 
 sleep 20
 
