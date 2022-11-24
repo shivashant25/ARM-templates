@@ -113,15 +113,6 @@ choco install git
 #install bicep module
 choco install bicep
 
-#create directory and clone bicep templates
-
-mkdir C:\Workspaces
-cd C:\Workspaces
-mkdir lab
-cd lab
-
-git clone --branch main https://github.com/shivashant25/aiw-devops-with-github-lab-files.git
-
 sleep 5
 
 #DownloadFiles
