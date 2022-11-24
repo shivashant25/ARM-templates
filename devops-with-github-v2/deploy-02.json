@@ -11,7 +11,6 @@
     "SubID": "[subscription().subscriptionId]",
     "publishingUsername": "[concat('$',parameters('DeploymentID'))]",
     "location": "[resourceGroup().location]",
-    "loadtestname": "[concat('fabmedical-loadtest-',parameters('DeploymentID'))]",
     "projectname": "[concat('devproject-',parameters('DeploymentID'))]",
     "rgname": "[resourceGroup().name]",
     "devCenterId": "[resourceId(resourceGroup().name,'Microsoft.DevCenter/devcenters',variables('devcentername'))]",
@@ -25,12 +24,6 @@
     "devboxsubnetid": "[concat(variables('vnetId1'), '/subnets/', variables('devboxsubnet'))]"
   },
   "resources": [
-    {
-      "type": "Microsoft.LoadTestService/loadtests",
-      "apiVersion": "2022-04-15-preview",
-      "name": "[variables('loadtestname')]",
-      "location": "[variables('location')]"
-    },
     {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2017-04-01",
