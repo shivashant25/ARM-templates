@@ -127,6 +127,41 @@ $RGname=contoso-traders-$deploymentid
 
 New-AzResourceGroupDeployment -Name "createresources" -TemplateFile "createResources.bicep" -TemplateParameterFile "createResources.parameters.json" -ResourceGroup $RGname
 
+$AKS_CLUSTER_NAME= "contoso-traders-aks"
+$AKS_NODES_RESOURCE_GROUP_NAME= "contoso-traders-aks-nodes-$deploymentid"
+$CDN_PROFILE_NAME= "contoso-traders-cdn"
+$SUB_DEPLOYMENT_REGION= "eastus"
+$KV_NAME= "contosotraderskv$deploymentid"
+$PRODUCTS_DB_NAME= "productsdb"
+$PRODUCTS_DB_SERVER_NAME= "contoso-traders-products"
+$PRODUCTS_DB_USER_NAME= "localadmin"
+$PRODUCT_DETAILS_CONTAINER_NAME= "product-details"
+$PRODUCT_IMAGES_STORAGE_ACCOUNT_NAME= "contosotradersimg"
+$PRODUCT_LIST_CONTAINER_NAME= "product-list"
+$PRODUCTS_CDN_ENDPOINT_NAME= "contoso-traders-images"
+$RESOURCE_GROUP_NAME= "contoso-traders-$deploymentid"
+$STORAGE_ACCOUNT_NAME= "contosotradersimg"
+
+
+
+
+Set-AzKeyVaultAccessPolicy -VaultName $KV_NAME
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sleep 20
 
