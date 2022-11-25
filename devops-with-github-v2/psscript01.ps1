@@ -74,9 +74,12 @@ sleep  10
 $WebClient = New-Object System.Net.WebClient
 $WebClient.DownloadFile("https://nodejs.org/download/release/v16.8.0/node-v16.8.0-x64.msi","C:\LabFiles\node-v16.8.0-x64.msi")
 
-sleep 5
 
 msiexec.exe /i "C:\LabFiles\node-v16.8.0-x64.msi" /qn ALLUSERS=2 MSIINSTALLPERUSER=1
+
+sleep 5
+$arguments = "/i `"C:\LabFiles\node-v16.8.0-x64.msi`" /quiet"
+Start-Process msiexec.exe -ArgumentList $arguments -Wait
 
 sleep 5
 
