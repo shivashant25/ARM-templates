@@ -19,7 +19,7 @@
     "devboxsubnet": "devboxsubnet",
     "subnetPrefix": "10.1.0.0/24",
     "addressPrefix": "10.1.0.0/16",
-    "netconnectionname": "contoso-connection",
+    "netconnectionname": "fabrikam-connection",
     "vnetId1": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', variables('devboxvnet'))]",	
     "devboxsubnetid": "[concat(variables('vnetId1'), '/subnets/', variables('devboxsubnet'))]"
   },
