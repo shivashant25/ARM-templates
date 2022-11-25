@@ -1,4 +1,3 @@
-
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
 Start-Transcript -Path C:\WindowsAzure\Logs\extensionlog.txt -Append
 Write-Host "Logon-task-started" 
@@ -21,6 +20,8 @@ Start-Process C:\wsl_update_x64.msi -ArgumentList "/quiet"
 . C:\LabFiles\AzureCreds.ps1
 
 $user = $AzureUserName
+
+$password = $AzurePassword
 
 $deploymentid = $env:DeploymentID
 
@@ -91,21 +92,22 @@ cd C:\Workspaces
 mkdir lab
 cd lab
 
-mkdir aiw-devops-with-github-lab-files
-cd aiw-devops-with-github-lab-files
-
 git clone --branch main https://github.com/shivashant25/aiw-devops-with-github-lab-files.git
 
 Sleep 5
 
 $path = "C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac"
 (Get-Content -Path "$path\createResources.parameters.json") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\createResources.parameters.json"
-#(Get-Content -Path "$path\configure-webapp.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\configure-webapp.ps1"
-#(Get-Content -Path "$path\deploy-appinsights.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\deploy-appinsights.ps1"
-#(Get-Content -Path "$path\deploy-infrastructure.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\deploy-infrastructure.ps1"
-#(Get-Content -Path "$path\seed-cosmosdb.ps1") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\seed-cosmosdb.ps1"
+
+$path = "C:\Workspaces\lab\aiw-devops-with-github-lab-files\src\ContosoTraders.Ui.Website\src\services"
+(Get-Content -Path "$path\configService.js") | ForEach-Object {$_ -Replace "deploymentidvalue", "$DeploymentID"} | Set-Content -Path "$path\configService.js"
+
+$path = "C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac"
+(Get-Content -Path "$path\createResources.parameters.json") | ForEach-Object {$_ -Replace "bicepsqlpass", "$password"} | Set-Content -Path "$path\createResources.parameters.json"
 
 Sleep 5
+
+#Az login
 
 . C:\LabFiles\AzureCreds.ps1
 
@@ -123,24 +125,24 @@ Connect-AzAccount -Credential $cred | Out-Null
 
 cd C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac
 
-$RGname=contoso-traders-$deploymentid
+$RGname = "contoso-traderss-$deploymentid"
 
 New-AzResourceGroupDeployment -Name "createresources" -TemplateFile "createResources.bicep" -TemplateParameterFile "createResources.parameters.json" -ResourceGroup $RGname
 
-$AKS_CLUSTER_NAME= "contoso-traders-aks"
-$AKS_NODES_RESOURCE_GROUP_NAME= "contoso-traders-aks-nodes-$deploymentid"
-$CDN_PROFILE_NAME= "contoso-traders-cdn"
-$SUB_DEPLOYMENT_REGION= "eastus"
-$KV_NAME= "contosotraderskv$deploymentid"
-$PRODUCTS_DB_NAME= "productsdb"
-$PRODUCTS_DB_SERVER_NAME= "contoso-traders-products"
-$PRODUCTS_DB_USER_NAME= "localadmin"
-$PRODUCT_DETAILS_CONTAINER_NAME= "product-details"
-$PRODUCT_IMAGES_STORAGE_ACCOUNT_NAME= "contosotradersimg"
-$PRODUCT_LIST_CONTAINER_NAME= "product-list"
-$PRODUCTS_CDN_ENDPOINT_NAME= "contoso-traders-images"
-$RESOURCE_GROUP_NAME= "contoso-traders-$deploymentid"
-$STORAGE_ACCOUNT_NAME= "contosotradersimg"
+$AKS_CLUSTER_NAME = "contoso-traders-aks"
+$AKS_NODES_RESOURCE_GROUP_NAME = "contoso-traders-aks-nodes-$deploymentid"
+$CDN_PROFILE_NAME = "contoso-traders-cdn"
+$SUB_DEPLOYMENT_REGION = "eastus"
+$KV_NAME = "contosotraderskv$deploymentid"
+$PRODUCTS_DB_NAME = "productsdb"
+$PRODUCTS_DB_SERVER_NAME = "contoso-traders-products"
+$PRODUCTS_DB_USER_NAME = "localadmin"
+$PRODUCT_DETAILS_CONTAINER_NAME = "product-details"
+$PRODUCT_IMAGES_STORAGE_ACCOUNT_NAME = "contosotradersimg"
+$PRODUCT_LIST_CONTAINER_NAME = "product-list"
+$PRODUCTS_CDN_ENDPOINT_NAME = "contoso-traders-images"
+$RESOURCE_GROUP_NAME = "contoso-traders-$deploymentid"
+$STORAGE_ACCOUNT_NAME = "contosotradersimg"
 
 
 
