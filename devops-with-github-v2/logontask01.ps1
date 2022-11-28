@@ -125,7 +125,7 @@ Connect-AzAccount -Credential $cred | Out-Null
 
 cd C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac
 
-$RGname = "contoso-traderss-$deploymentid"
+$RGname = "contoso-traders-$deploymentid"
 
 New-AzResourceGroupDeployment -Name "createresources" -TemplateFile "createResources.bicep" -TemplateParameterFile "createResources.parameters.json" -ResourceGroup $RGname
 
