@@ -95,7 +95,7 @@ cd C:\Workspaces
 mkdir lab
 cd lab
 
-git clone --branch main https://github.com/shivashant25/aiw-devops-with-github-lab-files.git
+git clone --branch main https://github.com/sumitmalik51/aiw-devops-with-github-lab-files.git
 
 Sleep 5
 
@@ -133,7 +133,7 @@ $RGname = "contoso-traders-$deploymentid"
 New-AzResourceGroupDeployment -Name "createresources" -TemplateFile "createResources.bicep" -TemplateParameterFile "createResources.parameters.json" -ResourceGroup $RGname
 
 $AKS_CLUSTER_NAME = "contoso-traders-aks$deploymentid"
-$AKS_NODES_RESOURCE_GROUP_NAME = "contoso-traders-aks-nodes-rg"
+$AKS_NODES_RESOURCE_GROUP_NAME = "contoso-traders-aks-nodes-rg$deploymentid"
 $CDN_PROFILE_NAME = "contoso-traders-cdn$deploymentid"
 $SUB_DEPLOYMENT_REGION = "eastus"
 $KV_NAME = "contosotraderskv$deploymentid"
