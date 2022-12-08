@@ -37,9 +37,9 @@ az config set extension.use_dynamic_install=yes_without_prompt
 
 Set-VSTeamAccount -Account https://dev.azure.com/aiw-devops/ -PersonalAccessToken $connectionToken
 
-Add-VSTeamProject -ProjectName fabrikam-$deploymentid -ProcessTemplate Basic 
+Add-VSTeamProject -ProjectName contosotraders-$deploymentid -ProcessTemplate Basic 
 
-$project = Get-VSTeamProject -Name fabrikam-$deploymentid
+$project = Get-VSTeamProject -Name contosotraders-$deploymentid
 
 
 
