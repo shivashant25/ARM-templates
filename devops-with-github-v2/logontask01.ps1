@@ -129,9 +129,9 @@ $RGname = "contoso-traders-$deploymentid"
 
 New-AzResourceGroupDeployment -Name "createresources" -TemplateFile "createResources.bicep" -TemplateParameterFile "createResources.parameters.json" -ResourceGroup $RGname
 
-$AKS_CLUSTER_NAME = "contoso-traders-aks"
-$AKS_NODES_RESOURCE_GROUP_NAME = "contoso-traders-aks-nodes-$deploymentid"
-$CDN_PROFILE_NAME = "contoso-traders-cdn"
+$AKS_CLUSTER_NAME = "contoso-traders-aks$deploymentid"
+$AKS_NODES_RESOURCE_GROUP_NAME = "contoso-traders-aks-nodes-rg"
+$CDN_PROFILE_NAME = "contoso-traders-cdn$deploymentid"
 $SUB_DEPLOYMENT_REGION = "eastus"
 $KV_NAME = "contosotraderskv$deploymentid"
 $PRODUCTS_DB_NAME = "productsdb"
@@ -140,15 +140,10 @@ $PRODUCTS_DB_USER_NAME = "localadmin"
 $PRODUCT_DETAILS_CONTAINER_NAME = "product-details"
 $PRODUCT_IMAGES_STORAGE_ACCOUNT_NAME = "contosotradersimg"
 $PRODUCT_LIST_CONTAINER_NAME = "product-list"
-$PRODUCTS_CDN_ENDPOINT_NAME = "contoso-traders-images"
+$PRODUCTS_CDN_ENDPOINT_NAME = "contoso-traders-images$deploymentid"
 $RESOURCE_GROUP_NAME = "contoso-traders-$deploymentid"
-$STORAGE_ACCOUNT_NAME = "contosotradersimg"
-
-
-
-
-Set-AzKeyVaultAccessPolicy -VaultName $KV_NAME
-
+$STORAGE_ACCOUNT_NAME = "contosotradersimg$deploymentid"
+$server = "contoso-traders-products$deploymentid.database.windows.net"
 
 
 
@@ -156,20 +151,46 @@ Set-AzKeyVaultAccessPolicy -VaultName $KV_NAME
 
 
 
+az login -u $userName -p  $password
+cd C:\Workspaces\lab\aiw-devops-with-github-lab-files
+  
+Invoke-Sqlcmd -InputFile ./src/ContosoTraders.Api.Products/Migration/productsdb.sql -Database productsdb -Username "localadmin" -Password $password -ServerInstance contoso-traders-products802322.database.windows.net -ErrorAction 'Stop' -Verbose -QueryTimeout 1800 # 30min
+
+
+az aks get-credentials -g $RESOURCE_GROUP_NAME -n $AKS_CLUSTER_NAME
+
+az keyvault set-policy -n $KV_NAME --key-permissions get list  --object-id $(az ad user show --id $(az account show --query "user.name" -o tsv) --query "id" -o tsv)
+
+az keyvault set-policy -n $KV_NAME  --secret-permissions get list --object-id $(az identity show --name "$AKS_CLUSTER_NAME-agentpool" -g $AKS_NODES_RESOURCE_GROUP_NAME --query "principalId" -o tsv)
+
+az storage blob sync --account-name $STORAGE_ACCOUNT_NAME -c $PRODUCT_DETAILS_CONTAINER_NAME -s 'src/ContosoTraders.Api.Images/product-details'
+
+az storage blob sync --account-name $STORAGE_ACCOUNT_NAME -c $PRODUCT_LIST_CONTAINER_NAME -s 'src/ContosoTraders.Api.Images/product-list'
+
+az cdn endpoint purge --no-wait --content-paths '/*' -n $PRODUCTS_CDN_ENDPOINT_NAME -g $RESOURCE_GROUP_NAME --profile-name $CDN_PROFILE_NAME
 
 
 
+kubectl get po -n chaos-testing
+
+choco install kubernetes-helm
+
+helm repo add chaos-mesh https://charts.chaos-mesh.org
+helm repo update
+kubectl create ns chaos-testing
+helm install chaos-mesh chaos-mesh/chaos-mesh --namespace=chaos-testing --set chaosDaemon.runtime=containerd --set chaosDaemon.socketPath=/run/containerd/containerd.sock
 
 
+kubectl get po -n chaos-testing
 
-
+kubectl run nginx --image=nginx --restart=Never
 
 
 sleep 20
 
 #check status of docker app installation aand cloned lab files
 $app = Get-Item -Path 'C:\Program Files\Docker\Docker\Docker Desktop.exe' 
-$clonefiles = Get-Item -Path 'C:\Workspaces\lab\mcw-continuous-delivery-lab-files\content-api'
+$clonefiles = Get-Item -Path 'C:\Workspaces\lab\aiw-devops-with-github-lab-files\src'
 
 if(($app -ne $null) -and ($clonefiles -ne $null))
 {
