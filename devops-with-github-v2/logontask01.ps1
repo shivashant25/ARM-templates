@@ -157,7 +157,7 @@ $server = "contoso-traders-products$deploymentid.database.windows.net"
 az login -u $userName -p  $password
 cd C:\Workspaces\lab\aiw-devops-with-github-lab-files
   
-Invoke-Sqlcmd -InputFile ./src/ContosoTraders.Api.Products/Migration/productsdb.sql -Database productsdb -Username "localadmin" -Password $password -ServerInstance contoso-traders-products$server.database.windows.net -ErrorAction 'Stop' -Verbose -QueryTimeout 1800 # 30min
+Invoke-Sqlcmd -InputFile ./src/ContosoTraders.Api.Products/Migration/productsdb.sql -Database productsdb -Username "localadmin" -Password $password -ServerInstance $server  -ErrorAction 'Stop' -Verbose -QueryTimeout 1800 # 30min
 
 
 az aks get-credentials -g $RESOURCE_GROUP_NAME -n $AKS_CLUSTER_NAME
