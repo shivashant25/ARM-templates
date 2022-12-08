@@ -115,7 +115,8 @@ choco install git
 
 #install bicep module
 choco install bicep
-
+Install-Module Sqlserver -SkipPublisherCheck -Force
+Import-Module Sqlserver
 sleep 5
 
 #DownloadFiles
