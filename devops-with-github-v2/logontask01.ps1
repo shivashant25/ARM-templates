@@ -29,6 +29,9 @@ $connectionToken = "twoexomspxea4p3p7qqduxmgkzznzjd2uyiavkngvkyjtwutiowa"
 
 refreshenv
 
+choco install bicep
+Install-Module Sqlserver -SkipPublisherCheck -Force
+Import-Module Sqlserver
 az config set extension.use_dynamic_install=yes_without_prompt
 
 
