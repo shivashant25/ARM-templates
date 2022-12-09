@@ -3,7 +3,7 @@ Start-Transcript -Path C:\WindowsAzure\Logs\extensionlog.txt -Append
 Write-Host "Logon-task-started" 
 
 $DeploymentID = $env:DeploymentID
-$AppID = $env:DeploymentID
+$AppID = $env:AppID
 
 Start-Process C:\Packages\extensions.bat
 Write-Host "Bypass-Execution-Policy"
