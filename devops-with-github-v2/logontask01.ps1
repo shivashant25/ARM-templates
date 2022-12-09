@@ -164,6 +164,9 @@ Invoke-Sqlcmd -InputFile ./src/ContosoTraders.Api.Products/Migration/productsdb.
 
 az aks get-credentials -g $RESOURCE_GROUP_NAME -n $AKS_CLUSTER_NAME
 
+$USER_ASSIGNED_MANAGED_IDENTITY_NAME = "contoso-traders-mi-kv-access$deploymentid"
+az vmss identity assign --identities $(az identity show -g $RESOURCE_GROUP_NAME  --name $USER_ASSIGNED_MANAGED_IDENTITY_NAME  --query "id" -o tsv) --ids $(az vmss list -g $AKS_NODES_RESOURCE_GROUP_NAME --query "[0].id" -o tsv) 
+
 az keyvault set-policy -n $KV_NAME --key-permissions get list  --object-id $(az ad user show --id $(az account show --query "user.name" -o tsv) --query "id" -o tsv)
 az keyvault set-policy -n $KV_NAME --key-permissions get list  --object-id  $AppID 
 
