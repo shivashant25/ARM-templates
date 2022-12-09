@@ -6,6 +6,7 @@ $DeploymentID = $env:DeploymentID
 
 Start-Process C:\Packages\extensions.bat
 Write-Host "Bypass-Execution-Policy"
+dotnet nuget add source "https://api.nuget.org/v3/index.json" --name "nuget.org"
 
 
 choco install docker-desktop --version=4.7.0
