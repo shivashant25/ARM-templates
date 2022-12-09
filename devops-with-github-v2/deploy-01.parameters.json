@@ -11,6 +11,12 @@
     "AzureUserName": {
       "value": "GET-AZUSER-UPN"
     },
+     "AppID": {
+      "value": "GET-SERVICEPRINCIPAL-APPLICATION-ID"
+    },
+    "AppSecret": {
+      "value": "GET-SERVICEPRINCIPAL-SECRET"
+    },
     "AzurePassword": {
       "value": "GET-AZUSER-PASSWORD"
     },
