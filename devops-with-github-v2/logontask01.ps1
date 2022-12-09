@@ -3,6 +3,7 @@ Start-Transcript -Path C:\WindowsAzure\Logs\extensionlog.txt -Append
 Write-Host "Logon-task-started" 
 
 $DeploymentID = $env:DeploymentID
+$AppID = $env:DeploymentID
 
 Start-Process C:\Packages\extensions.bat
 Write-Host "Bypass-Execution-Policy"
@@ -164,6 +165,7 @@ Invoke-Sqlcmd -InputFile ./src/ContosoTraders.Api.Products/Migration/productsdb.
 az aks get-credentials -g $RESOURCE_GROUP_NAME -n $AKS_CLUSTER_NAME
 
 az keyvault set-policy -n $KV_NAME --key-permissions get list  --object-id $(az ad user show --id $(az account show --query "user.name" -o tsv) --query "id" -o tsv)
+az keyvault set-policy -n $KV_NAME --key-permissions get list  --object-id $(az ad user show --id $AppID 
 
 az keyvault set-policy -n $KV_NAME  --secret-permissions get list --object-id $(az identity show --name "$AKS_CLUSTER_NAME-agentpool" -g $AKS_NODES_RESOURCE_GROUP_NAME --query "principalId" -o tsv)
 
