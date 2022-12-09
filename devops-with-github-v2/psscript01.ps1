@@ -7,6 +7,11 @@ Param (
     [string]
     $AzureTenantID,
     [string]
+    $AppID,
+
+    [string]
+    $AppSecret,
+    [string]
     $AzureSubscriptionID,
     [string]
     $ODLID,
@@ -37,6 +42,7 @@ Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsCustomScriptExtension.txt -
 $adminUsername = "demouser"
 [System.Environment]::SetEnvironmentVariable('DeploymentID', $DeploymentID,[System.EnvironmentVariableTarget]::Machine)
 
+[System.Environment]::SetEnvironmentVariable('AppID', $AppID,[System.EnvironmentVariableTarget]::Machine)
 
 #Import Common Functions
 $path = pwd
