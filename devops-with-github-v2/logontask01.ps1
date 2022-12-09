@@ -179,10 +179,25 @@ az storage blob sync --account-name $STORAGE_ACCOUNT_NAME -c $PRODUCT_LIST_CONTA
 az cdn endpoint purge --no-wait --content-paths '/*' -n $PRODUCTS_CDN_ENDPOINT_NAME -g $RESOURCE_GROUP_NAME --profile-name $CDN_PROFILE_NAME
 
 
+#Az login
 
-kubectl get po -n chaos-testing
+. C:\LabFiles\AzureCreds.ps1
+
+$userName = $AzureUserName
+$password = $AzurePassword
+$subscriptionId = $AzureSubscriptionID
+$TenantID = $AzureTenantID
+
+
+$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
+$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
+
+Connect-AzAccount -Credential $cred | Out-Null
+
 
 choco install kubernetes-helm
+
+kubectl get po -n chaos-testing
 
 helm repo add chaos-mesh https://charts.chaos-mesh.org
 helm repo update
