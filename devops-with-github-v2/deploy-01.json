@@ -45,10 +45,16 @@
     },
     "trainerUserPassword": {
       "type": "string"
+    },
+      "AppID": {
+      "type": "string"
+    },
+    "AppSecret": {
+      "type": "string"
     }
   },
   "variables": {
-    "cloudlabsCommon": "[concat(' -AzureUserName ', parameters('AzureUserName'), ' -AzurePassword ', parameters('AzurePassword'), ' -AzureTenantID ', variables('AzureTenantID'), ' -AzureSubscriptionID ', variables('AzureSubscriptionID'), ' -ODLID ', parameters('ODLID'), ' -DeploymentID ', parameters('DeploymentID'), ' -InstallCloudLabsShadow ', parameters('InstallCloudLabsShadow'), ' -vmAdminPassword ', parameters('vmAdminPassword'))]",
+    "cloudlabsCommon": "[concat(' -AzureUserName ', parameters('AzureUserName'), ' -AzurePassword ', parameters('AzurePassword'), ' -AzureTenantID ', variables('AzureTenantID'), ' -AzureSubscriptionID ', variables('AzureSubscriptionID'), ' -ODLID ', parameters('ODLID'), ' -DeploymentID ', parameters('DeploymentID'), ' -InstallCloudLabsShadow ', parameters('InstallCloudLabsShadow'), ' -vmAdminPassword ', parameters('vmAdminPassword'), ' ', '-AppID', ' ',parameters('AppID'), ' ', '-AppSecret', ' ',parameters('AppSecret'))]",
     "Enable-CloudLabsEmbeddedShadow": "[concat(' -vmAdminUsername ', parameters('vmAdminUsername'), ' -trainerUserName ', parameters('trainerUserName'), ' -trainerUserPassword ', parameters('trainerUserPassword'))]",
     "AzureSubscriptionID": "[subscription().subscriptionId]",
     "AzureTenantID": "[subscription().tenantId]",
