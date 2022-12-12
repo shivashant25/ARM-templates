@@ -27,7 +27,7 @@ $password = $AzurePassword
 
 $deploymentid = $env:DeploymentID
 
-$connectionToken = "vcgq2g3sdbfdkywdwvdzylugpr3dtymx22aybvo66vp5esgdccvq"
+$connectionToken = "adtjljjxy2xyq6ev22dtoujpsafvfge7zyi6jbofcpry66i5dt7q"
 
 refreshenv
 
