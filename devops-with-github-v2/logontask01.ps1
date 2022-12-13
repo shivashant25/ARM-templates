@@ -32,6 +32,7 @@ $connectionToken = "adtjljjxy2xyq6ev22dtoujpsafvfge7zyi6jbofcpry66i5dt7q"
 refreshenv
 
 choco install bicep
+choco install kubernetes-helm
 Install-Module Sqlserver -SkipPublisherCheck -Force
 Import-Module Sqlserver
 az config set extension.use_dynamic_install=yes_without_prompt
@@ -194,16 +195,10 @@ $password = $AzurePassword
 $subscriptionId = $AzureSubscriptionID
 $TenantID = $AzureTenantID
 
-
 $securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
 
 Connect-AzAccount -Credential $cred | Out-Null
-
-
-choco install kubernetes-helm
-
-Sleep 5
 
 helm repo add chaos-mesh https://charts.chaos-mesh.org
 helm repo update
@@ -222,11 +217,20 @@ kubectl run nginx --image=nginx --restart=Never
 
 sleep 20
 
-#check status of docker app installation aand cloned lab files
-$app = Get-Item -Path 'C:\Program Files\Docker\Docker\Docker Desktop.exe' 
-$clonefiles = Get-Item -Path 'C:\Workspaces\lab\aiw-devops-with-github-lab-files\src'
+#check bicep deployment status and cloned lab files
 
-if(($app -ne $null) -and ($clonefiles -ne $null))
+$chaspod = kubectl get po -n chaos-testing 
+
+$RGname = "contoso-traders-$deploymentid"
+
+$RG1 = Get-AzResourceGroupDeployment -Name "createresources" -ResourceGroupName $RGname
+
+$RG1 = $RG1.ProvisioningState
+
+$clonefiles = Get-Item -Path 'C:\Workspaces\lab\aiw-devops-with-github-lab-files\src'
+$deploymentstatus = $RG1
+
+if(($deploymentstatus -ne $null) -and ($clonefiles -ne $null) -and ($chaspod -ne $null))
 {
     Write-Information "Validation Passed"
     
