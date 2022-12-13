@@ -203,13 +203,17 @@ Connect-AzAccount -Credential $cred | Out-Null
 
 choco install kubernetes-helm
 
-kubectl get po -n chaos-testing
+Sleep 5
 
 helm repo add chaos-mesh https://charts.chaos-mesh.org
 helm repo update
 kubectl create ns chaos-testing
+
+sleep 20
+
 helm install chaos-mesh chaos-mesh/chaos-mesh --namespace=chaos-testing --set chaosDaemon.runtime=containerd --set chaosDaemon.socketPath=/run/containerd/containerd.sock
 
+sleep 20
 
 kubectl get po -n chaos-testing
 
