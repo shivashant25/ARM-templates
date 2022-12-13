@@ -35,8 +35,9 @@ choco install bicep
 choco install kubernetes-helm
 Install-Module Sqlserver -SkipPublisherCheck -Force
 Import-Module Sqlserver
+choco install kubernetes-cli
 az config set extension.use_dynamic_install=yes_without_prompt
-
+refreshenv
 
 Set-VSTeamAccount -Account https://dev.azure.com/aiw-devops/ -PersonalAccessToken $connectionToken
 
@@ -260,8 +261,7 @@ else {
       } 
  SetDeploymentStatus $ValidStatus $ValidMessage
 
-#Import Common Functions
-$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.12\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
+$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\"+ "1.10.*" + "\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
 . $commonscriptpath
 
 sleep 3
