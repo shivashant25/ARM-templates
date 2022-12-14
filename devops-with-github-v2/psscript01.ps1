@@ -153,7 +153,7 @@ Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type
 $Trigger= New-ScheduledTaskTrigger -AtLogOn
 $User= "$($env:ComputerName)\$adminUsername" 
 $Action= New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File C:\Packages\logontask.ps1"
-Register-ScheduledTask -TaskName "Installdocker" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force
+Register-ScheduledTask -TaskName "logontask" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force
 
 #Use the cloudlabs common function to write the status to validation status txt file 
 $Validstatus="Pending"  ##Failed or Successful at the last step
