@@ -2,6 +2,9 @@ Set-ExecutionPolicy -ExecutionPolicy bypass -Force
 Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsLogOnTask.txt -Append
 Write-Host "Logon-task-started" 
 
+$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\1.10.14\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
+. $commonscriptpath
+
 $DeploymentID = $env:DeploymentID
 $AppID = $env:AppID
 
@@ -220,8 +223,25 @@ else {
     Write-Warning "Validation Failed - see log output"
     $validstatus = "Failed"
       }
-     
-CloudlabsManualAgent setStatus
+
+Function SetDeploymentStatus($ManualStepStatus, $ManualStepMessage)
+{
+
+    (Get-Content -Path "C:\WindowsAzure\Logs\status-sample.txt") | ForEach-Object {$_ -Replace "ReplaceStatus", "$ManualStepStatus"} | Set-Content -Path "C:\WindowsAzure\Logs\validationstatus.txt"
+    (Get-Content -Path "C:\WindowsAzure\Logs\validationstatus.txt") | ForEach-Object {$_ -Replace "ReplaceMessage", "$ManualStepMessage"} | Set-Content -Path "C:\WindowsAzure\Logs\validationstatus.txt"
+}
+ if ($validstatus -eq "Successfull") {
+    $ValidStatus="Succeeded"
+    $ValidMessage="Environment is validated and the deployment is successful"
+
+Remove-Item 'C:\WindowsAzure\Logs\CloudLabsCustomScriptExtension.txt' -force
+      }
+else {
+    Write-Warning "Validation Failed - see log output"
+    $ValidStatus="Failed"
+    $ValidMessage="Environment Validation Failed and the deployment is Failed"
+      } 
+ SetDeploymentStatus $ValidStatus $ValidMessage
 
 #Start the cloudlabs agent service 
 CloudlabsManualAgent Start     
