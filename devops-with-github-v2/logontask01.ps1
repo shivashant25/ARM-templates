@@ -1,5 +1,5 @@
 Set-ExecutionPolicy -ExecutionPolicy bypass -Force
-Start-Transcript -Path C:\WindowsAzure\Logs\extensionlog.txt -Append
+Start-Transcript -Path C:\WindowsAzure\Logs\CloudLabsLogOnTask.txt -Append
 Write-Host "Logon-task-started" 
 
 $DeploymentID = $env:DeploymentID
@@ -19,6 +19,12 @@ Write-Host "Docker-install"
 (New-Object System.Net.WebClient).DownloadFile('https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi', 'C:\wsl_update_x64.msi')
 Start-Process C:\wsl_update_x64.msi -ArgumentList "/quiet"
 
+choco install bicep
+choco install kubernetes-helm
+Install-Module Sqlserver -SkipPublisherCheck -Force
+Import-Module Sqlserver
+choco install kubernetes-cli
+
 . C:\LabFiles\AzureCreds.ps1
 
 $user = $AzureUserName
@@ -30,14 +36,7 @@ $deploymentid = $env:DeploymentID
 $connectionToken = "adtjljjxy2xyq6ev22dtoujpsafvfge7zyi6jbofcpry66i5dt7q"
 
 refreshenv
-
-choco install bicep
-choco install kubernetes-helm
-Install-Module Sqlserver -SkipPublisherCheck -Force
-Import-Module Sqlserver
-choco install kubernetes-cli
 az config set extension.use_dynamic_install=yes_without_prompt
-refreshenv
 
 Set-VSTeamAccount -Account https://dev.azure.com/aiw-devops/ -PersonalAccessToken $connectionToken
 
@@ -45,21 +44,14 @@ Add-VSTeamProject -ProjectName contosotraders-$deploymentid -ProcessTemplate Bas
 
 $project = Get-VSTeamProject -Name contosotraders-$deploymentid
 
-
-
 $projectID = $project.Id
 
-
 Add-VSTeamUserEntitlement -Email $user -ProjectName $project.Name -License Express -LicensingSource none -Group ProjectAdministrator   -Verbose
-
-
 
 $base64AuthInfo = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes(":$($connectionToken)"))
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("Authorization", "Basic $base64AuthInfo")
 $headers.Add("Content-Type", "application/json")
-
-
 
 $body = "{
  `"accessLevel`": {
@@ -93,7 +85,6 @@ $response | ConvertTo-Json
 cd C:\
 
 #create directory and clone bicep templates
-
 mkdir C:\Workspaces
 cd C:\Workspaces
 mkdir lab
@@ -104,7 +95,6 @@ git clone --branch main https://github.com/sumitmalik51/aiw-devops-with-github-l
 Sleep 5
 
 $password = $AzurePassword
-
 $deploymentid = $env:DeploymentID
 
 $path = "C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac"
@@ -119,7 +109,6 @@ $path = "C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac"
 Sleep 5
 
 #Az login
-
 . C:\LabFiles\AzureCreds.ps1
 
 $userName = $AzureUserName
@@ -127,13 +116,12 @@ $password = $AzurePassword
 $subscriptionId = $AzureSubscriptionID
 $TenantID = $AzureTenantID
 
-
 $securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
 
 Connect-AzAccount -Credential $cred | Out-Null
 
-
+#deploy resources using bicep templates
 cd C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac
 
 $RGname = "contoso-traders-$deploymentid"
@@ -156,17 +144,10 @@ $RESOURCE_GROUP_NAME = "contoso-traders-$deploymentid"
 $STORAGE_ACCOUNT_NAME = "contosotradersimg$deploymentid"
 $server = "contoso-traders-products$deploymentid.database.windows.net"
 
-
-
-
-
-
-
 az login -u $userName -p  $password
 cd C:\Workspaces\lab\aiw-devops-with-github-lab-files
   
 Invoke-Sqlcmd -InputFile ./src/ContosoTraders.Api.Products/Migration/productsdb.sql -Database productsdb -Username "localadmin" -Password $password -ServerInstance $server  -ErrorAction 'Stop' -Verbose -QueryTimeout 1800 # 30min
-
 
 az aks get-credentials -g $RESOURCE_GROUP_NAME -n $AKS_CLUSTER_NAME
 
@@ -186,9 +167,7 @@ az storage blob sync --account-name $STORAGE_ACCOUNT_NAME -c $PRODUCT_LIST_CONTA
 
 az cdn endpoint purge --no-wait --content-paths '/*' -n $PRODUCTS_CDN_ENDPOINT_NAME -g $RESOURCE_GROUP_NAME --profile-name $CDN_PROFILE_NAME
 
-
 #Az login
-
 . C:\LabFiles\AzureCreds.ps1
 
 $userName = $AzureUserName
@@ -241,33 +220,12 @@ else {
     Write-Warning "Validation Failed - see log output"
     $validstatus = "Failed"
       }
-      
-Function SetDeploymentStatus($ManualStepStatus, $ManualStepMessage)
-{
+     
+CloudlabsManualAgent setStatus
 
-    (Get-Content -Path "C:\WindowsAzure\Logs\status-sample.txt") | ForEach-Object {$_ -Replace "ReplaceStatus", "$ManualStepStatus"} | Set-Content -Path "C:\WindowsAzure\Logs\validationstatus.txt"
-    (Get-Content -Path "C:\WindowsAzure\Logs\validationstatus.txt") | ForEach-Object {$_ -Replace "ReplaceMessage", "$ManualStepMessage"} | Set-Content -Path "C:\WindowsAzure\Logs\validationstatus.txt"
-}
- if ($validstatus -eq "Successfull") {
-    $ValidStatus="Succeeded"
-    $ValidMessage="Environment is validated and the deployment is successful"
-    
-Remove-Item 'C:\WindowsAzure\Logs\CloudLabsCustomScriptExtension.txt' -force
-      }
-else {
-    Write-Warning "Validation Failed - see log output"
-    $ValidStatus="Failed"
-    $ValidMessage="Environment Validation Failed and the deployment is Failed"
-      } 
- SetDeploymentStatus $ValidStatus $ValidMessage
-
-$commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension\"+ "1.10.*" + "\Downloads\0\cloudlabs-common\cloudlabs-windows-functions.ps1"
-. $commonscriptpath
-
-sleep 3
 #Start the cloudlabs agent service 
-CloudlabsManualAgent Start
+CloudlabsManualAgent Start     
 
 sleep 5
-Unregister-ScheduledTask -TaskName "Installdocker" -Confirm:$false 
+Unregister-ScheduledTask -TaskName "logontask" -Confirm:$false 
 Restart-Computer -Force 
