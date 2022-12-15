@@ -64,7 +64,7 @@ $project = Get-VSTeamProject -Name contosotraders-$deploymentid
 
 $projectID = $project.Id
 
-Add-VSTeamUserEntitlement -Email $user -ProjectName $project.Name -License Express -LicensingSource none -Group ProjectAdministrator   -Verbose
+Add-VSTeamUserEntitlement -Email $user -ProjectName $project.Name -License Advanced -LicensingSource none -Group ProjectAdministrator   -Verbose
 
 $base64AuthInfo = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes(":$($connectionToken)"))
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -73,7 +73,7 @@ $headers.Add("Content-Type", "application/json")
 
 $body = "{
  `"accessLevel`": {
- `"accountLicenseType`": `"express`"
+ `"accountLicenseType`": `"advanced`"
  },
  `"extensions`": [
  {
