@@ -108,9 +108,11 @@ cd C:\Workspaces
 mkdir lab
 cd lab
 
-git clone --branch main https://github.com/sumitmalik51/aiw-devops-with-github-lab-files.git
+git clone --branch contosotraders-lab-files https://github.com/CloudLabsAI-Azure/AIW-DevOps-with-GitHub-V2.git
 
 Sleep 5
+
+Rename-Item -Path "C:\Workspaces\lab\AIW-DevOps-with-GitHub-V2"-NewName "aiw-devops-with-github-lab-files"
 
 $password = $AzurePassword
 $deploymentid = $env:DeploymentID
