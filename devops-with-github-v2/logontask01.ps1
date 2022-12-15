@@ -181,6 +181,8 @@ az keyvault set-policy -n $KV_NAME  --secret-permissions get list set --object-i
 
 az keyvault set-policy -n $KV_NAME  --secret-permissions get list set --object-id  $AppID 
 
+az keyvault set-policy -n $KV_NAME  --secret-permissions get list set --object-id $(az ad sp show --id $(az account show --query "user.name" -o tsv) --query "id" -o tsv)
+
 az storage blob sync --account-name $STORAGE_ACCOUNT_NAME -c $PRODUCT_DETAILS_CONTAINER_NAME -s 'src/ContosoTraders.Api.Images/product-details'
 
 az storage blob sync --account-name $STORAGE_ACCOUNT_NAME -c $PRODUCT_LIST_CONTAINER_NAME -s 'src/ContosoTraders.Api.Images/product-list'
