@@ -1,0 +1,255 @@
+{
+    "if": {
+       "anyOf": [
+        {
+           "not": {
+             "anyOf": [
+                   {
+                   "field": "type",
+                   "like": "microsoft.alertsmanagement/smartDetectorAlertRules/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.App/containerApps/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.App/managedEnvironments/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Cache/Redis/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Cdn/profiles/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Cdn/profiles/endpoints/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Chaos/experiments/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.ContainerRegistry/registries/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.ContainerService/managedClusters/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.DevCenter/devcenters/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.DevCenter/devcenters/devboxdefinitions/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.DevCenter/networkconnections/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.DevCenter/projects/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.DevCenter/projects/pools/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.DocumentDB/databaseAccounts/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "microsoft.insights/actiongroups/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Insights/components/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.KeyVault/vaults/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.LoadTestService/loadtests/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.ManagedIdentity/userAssignedIdentities/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Network/virtualNetworks/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.OperationalInsights/workspaces/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.OperationsManagement/solutions/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Portal/dashboards/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Sql/servers/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Sql/servers/databases/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Storage/storageAccounts/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Web/serverFarms/*"
+                   },
+                   {
+                   "field": "type",
+                   "like": "Microsoft.Web/sites/*"
+                   },
+                   {
+				    "field": "type",
+				    "like": "Microsoft.Compute/virtualMachineScaleSets/*"
+				    }, 
+                    {
+                        "field": "type",
+                        "like": "Microsoft.Network/loadBalancers/*"
+                        },
+                        {
+                        "field": "type",
+                        "like": "Microsoft.Network/networkSecurityGroups/*"
+                        },
+                        {
+                        "field": "type",
+                        "like": "Microsoft.Network/publicIPAddresses/*"
+                        },
+                        {
+                        "field": "type",
+                        "like": "Microsoft.Network/routeTables/*"
+                        },                                      
+                   {
+                   "field": "type",
+                   "in": ["Microsoft.Network/loadBalancers", "Microsoft.Network/networkSecurityGroups", "Microsoft.Network/publicIPAddresses", "Microsoft.Network/routeTables", "Microsoft.Compute/virtualMachineScaleSets", "microsoft.alertsmanagement/smartDetectorAlertRules", "Microsoft.App/containerApps", "Microsoft.App/managedEnvironments", "Microsoft.Cache/Redis", "Microsoft.Cdn/profiles", "Microsoft.Cdn/profiles/endpoints", "Microsoft.Chaos/experiments", "Microsoft.ContainerRegistry/registries", "Microsoft.ContainerService/managedClusters", "Microsoft.DevCenter/devcenters", "Microsoft.DevCenter/devcenters/devboxdefinitions", "Microsoft.DevCenter/networkconnections", "Microsoft.DevCenter/projects", "Microsoft.DevCenter/projects/pools", "Microsoft.DocumentDB/databaseAccounts", "microsoft.insights/actiongroups", "Microsoft.Insights/components", "Microsoft.KeyVault/vaults", "Microsoft.LoadTestService/loadtests", "Microsoft.ManagedIdentity/userAssignedIdentities", "Microsoft.Network/virtualNetworks", "Microsoft.OperationalInsights/workspaces", "Microsoft.OperationsManagement/solutions", "Microsoft.Portal/dashboards", "Microsoft.Sql/servers", "Microsoft.Sql/servers/databases", "Microsoft.Storage/storageAccounts", "Microsoft.Web/serverFarms", "Microsoft.Web/sites"]
+                   }
+               ]
+           }
+        },
+        {
+            "allof": [
+              {
+                "field": "type",
+                "equals": "Microsoft.Compute/virtualMachineScaleSets"
+              },
+              {
+                "not": {
+                  "field": "Microsoft.Compute/virtualMachineScaleSets/Sku.Name",
+                  "in": ["standard_d2s_v3"]
+                  }
+                }
+              ]
+        },        
+        {
+            "allof": [
+              {
+                "field": "type",
+                "equals": "Microsoft.Network/loadBalancers"
+              },
+              {
+                "not": {
+                  "field": "Microsoft.Network/loadBalancers/Sku.Name",
+                  "in": ["Standard"]
+                  }
+                }
+              ]
+         },        
+         {
+         "allof": [
+           {
+             "field": "type",
+             "equals": "Microsoft.ContainerRegistry/registries"
+           },
+           {
+           "field": "Microsoft.ContainerRegistry/registries/sku.name",
+           "notIn": ["Basic"]
+           }
+           ]
+         },
+         {
+         "allof": [
+           {
+             "field": "type",
+             "equals": "Microsoft.KeyVault/vaults"
+           },
+           {
+           "field": "Microsoft.KeyVault/vaults/sku.name",
+           "notIn": ["Standard"]
+           }
+           ]
+         },
+        {
+         "allof":[
+           {
+             "field": "type",
+             "equals": "Microsoft.SQL/servers/databases"
+           },
+           {
+             "not":{
+                   "field": "Microsoft.Sql/servers/databases/requestedServiceObjectiveName",
+                   "in": ["Basic"]
+             }
+           }
+         ]
+       },
+           {
+           "allOf": [
+             {
+               "source": "action",
+               "equals": "Microsoft.Storage/storageAccounts/write"
+             },
+             {
+               "field": "type",
+               "equals": "Microsoft.Storage/storageAccounts"
+             },
+             {
+               "not": 
+                 {
+                   "field": "Microsoft.Storage/storageAccounts/sku.name",
+                   "in": ["StandardLRS"]
+                 }
+              }
+           ]
+         },
+         {
+         "allof": [
+           {
+             "field": "type",
+             "equals": "Microsoft.Web/serverfarms"
+           },
+           {
+             "not": {
+               "field": "Microsoft.Web/serverfarms/sku.name",
+               "in": ["B1"]
+               }
+             }
+           ]
+         }
+
+     ]
+   },
+   "then": {
+     "effect": "deny"
+   }
+}
