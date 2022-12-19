@@ -214,6 +214,17 @@ kubectl get po -n chaos-testing
 
 kubectl run nginx --image=nginx --restart=Never
 
+sleep 20
+
+$definition = New-AzPolicyDefinition -Name 'SpektraCustomPolicy' -DisplayName 'Spektra Custom Policy' -Policy 'https://raw.githubusercontent.com/shivashant25/ARM-templates/main/devops-with-github-v2/policy-01.json'
+
+$RGname = "contoso-traders-$deploymentid"
+
+$rg = Get-AzResourceGroup -Name $RGname
+
+$definition = Get-AzPolicyDefinition | Where-Object { $_.Properties.DisplayName -eq 'SpektraCustomPolicy' }
+
+New-AzPolicyAssignment -Name 'spektra-policy-assignment' -DisplayName 'Spektra Custom Policy Assignment' -Scope $rg.ResourceId -PolicyDefinition $definition
 
 sleep 20
 
@@ -230,7 +241,7 @@ $RG1 = $RG1.ProvisioningState
 $clonefiles = Get-Item -Path 'C:\Workspaces\lab\aiw-devops-with-github-lab-files\src'
 $deploymentstatus = $RG1
 
-if(($deploymentstatus -ne $null) -and ($clonefiles -ne $null) -and ($chaspod -ne $null))
+if(($deploymentstatus -ne $null) -and ($clonefiles -ne $null) -and ($chaspod -ne $null) -and ($checkpolicy -ne $null))
 {
     Write-Information "Validation Passed"
     
