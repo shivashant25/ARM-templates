@@ -230,6 +230,8 @@ sleep 20
 
 #check bicep deployment status and cloned lab files
 
+$checkpolicy = Get-AzPolicyAssignment -Name 'spektra-policy-assignment' -Scope $rg.ResourceId
+
 $chaspod = kubectl get po -n chaos-testing 
 
 $RGname = "contoso-traders-$deploymentid"
