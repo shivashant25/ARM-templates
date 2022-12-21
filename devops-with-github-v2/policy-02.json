@@ -1,0 +1,88 @@
+﻿{
+	 "if": {
+	    "anyOf": [
+		 {
+			"not": {
+			  "anyOf": [
+                    {
+				    "field": "type",
+				    "like": "Microsoft.Compute/virtualMachineScaleSets/*"
+				    },
+                    {
+				    "field": "type",
+				    "like": "Microsoft.ManagedIdentity/userAssignedIdentities/*"
+				    },
+                    {
+				    "field": "type",
+				    "like": "Microsoft.Network/loadBalancers/*"
+				    },
+                    {
+				    "field": "type",
+				    "like": "Microsoft.Network/networkSecurityGroups/*"
+				    },
+                    {
+				    "field": "type",
+				    "like": "Microsoft.Network/publicIPAddresses/*"
+				    },
+                    {
+				    "field": "type",
+				    "like": "Microsoft.Network/routeTables/*"
+				    },
+                    {
+				    "field": "type",
+				    "like": "Microsoft.Network/virtualNetworks/*"
+				    },
+                    {
+				    "field": "type",
+				    "in": ["Microsoft.Compute/virtualMachineScaleSets", "Microsoft.ManagedIdentity/userAssignedIdentities", "Microsoft.Network/loadBalancers", "Microsoft.Network/networkSecurityGroups", "Microsoft.Network/publicIPAddresses", "Microsoft.Network/routeTables", "Microsoft.Network/virtualNetworks"]
+				    }
+                ]
+			}
+		 },
+          {
+		  "allof": [
+			{
+			  "field": "type",
+			  "equals": "Microsoft.Compute/virtualMachineScaleSets"
+			},
+			{
+			  "not": {
+				"field": "Microsoft.Compute/virtualMachineScaleSets/Sku.Name",
+				"in": ["standard_d2s_v3"]
+				}
+			  }
+			]
+		  },
+          {
+		  "allof": [
+			{
+			  "field": "type",
+			  "equals": "Microsoft.KeyVault/vaults"
+			},
+			{
+            "field": "Microsoft.KeyVault/vaults/sku.name",
+            "notIn": ["Standard"]
+            }
+			]
+		  },
+          {
+		  "allof": [
+			{
+			  "field": "type",
+			  "equals": "Microsoft.Network/loadBalancers"
+			},
+			{
+			  "not": {
+				"field": "Microsoft.Network/loadBalancers/Sku.Name",
+				"in": ["Standard"]
+				}
+			  }
+			]
+		  },
+
+	  ]
+	},
+	"then": {
+	  "effect": "deny"
+	}
+}
