@@ -34,14 +34,14 @@
                     "Microsoft.Sql/servers/*",
                     "Microsoft.Sql/servers/databases/*",
                     "Microsoft.Storage/storageAccounts/*",
-                    "Microsoft.Web/serverFarms/*",
                     "Microsoft.Compute/virtualMachineScaleSets/*",   
                     "Microsoft.Network/loadBalancers/*",  
                     "Microsoft.Network/networkSecurityGroups/*",  
                     "Microsoft.Network/publicIPAddresses/*",
                     "Microsoft.Network/routeTables/*", 
-                    "Microsoft.Network/networkInterfaces/*",                                                                                                                
-                    "Microsoft.Web/sites/*"
+                    "Microsoft.Network/networkInterfaces/*", 
+                    "Microsoft.Chaos/targets/capabilities/write",
+                    "Microsoft.Chaos/targets/write"        
                 ],
     "NotActions":  [
 
