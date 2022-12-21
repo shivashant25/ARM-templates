@@ -33,15 +33,7 @@
                     "Microsoft.Resources/subscriptions/resourceGroups/read",
                     "Microsoft.Sql/servers/*",
                     "Microsoft.Sql/servers/databases/*",
-                    "Microsoft.Storage/storageAccounts/*",
-                    "Microsoft.Compute/virtualMachineScaleSets/*",   
-                    "Microsoft.Network/loadBalancers/*",  
-                    "Microsoft.Network/networkSecurityGroups/*",  
-                    "Microsoft.Network/publicIPAddresses/*",
-                    "Microsoft.Network/routeTables/*", 
-                    "Microsoft.Network/networkInterfaces/*", 
-                    "Microsoft.Chaos/targets/capabilities/write",
-                    "Microsoft.Chaos/targets/write"        
+                    "Microsoft.Storage/storageAccounts/*"
                 ],
     "NotActions":  [
 
