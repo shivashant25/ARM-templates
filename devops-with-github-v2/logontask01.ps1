@@ -175,7 +175,17 @@ $USER_ASSIGNED_MANAGED_IDENTITY_NAME = "contoso-traders-mi-kv-access$deploymenti
 az vmss identity assign --identities $(az identity show -g $RESOURCE_GROUP_NAME  --name $USER_ASSIGNED_MANAGED_IDENTITY_NAME  --query "id" -o tsv) --ids $(az vmss list -g $AKS_NODES_RESOURCE_GROUP_NAME --query "[0].id" -o tsv) 
 
 az keyvault set-policy -n $KV_NAME --key-permissions get list  --object-id $(az ad user show --id $(az account show --query "user.name" -o tsv) --query "id" -o tsv)
-az keyvault set-policy -n $KV_NAME --key-permissions get list --object-id  $AppID 
+
+$servicePrincipalDisplayName = "https://odl_user_sp_$deploymentid"
+$servicePrincipal = Get-AzADServicePrincipal -DisplayName $servicePrincipalDisplayName
+
+sleep 10
+
+$SPobjectID = $servicePrincipal.Id
+
+az keyvault set-policy -n $KV_NAME  --secret-permissions get list set --object-id $SPobjectID
+
+az keyvault set-policy -n $KV_NAME --key-permissions get list --object-id $SPobjectID 
 
 az keyvault set-policy -n $KV_NAME  --secret-permissions get list set --object-id $(az identity show --name "$AKS_CLUSTER_NAME-agentpool" -g $AKS_NODES_RESOURCE_GROUP_NAME --query "principalId" -o tsv)
 
