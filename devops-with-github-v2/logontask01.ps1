@@ -51,7 +51,7 @@ $password = $AzurePassword
 
 $deploymentid = $env:DeploymentID
 
-$connectionToken = "m6kk3lesc7gxadtqz4byaidrzc5nm7uot7sprhjcbf7m3vwafxxa"
+$connectionToken = "onoy63ek25qcppp3ysu4orvz7mez32aj6d6ilmrfgpnnaskt2jca"
 
 refreshenv
 az config set extension.use_dynamic_install=yes_without_prompt
