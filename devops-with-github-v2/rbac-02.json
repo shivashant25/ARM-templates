@@ -1,5 +1,5 @@
 {
-    "Name":  "Spektra Custom RBAC",
+    "Name":  "Spektra AKS DYNAMIC RG RBAC",
     "Id":  null,
     "IsCustom":  true,
     "Description":  "Spektra Training Custom Role.",
