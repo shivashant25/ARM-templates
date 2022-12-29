@@ -250,6 +250,31 @@ New-AzPolicyAssignment -Name 'spektra-policy-AKSRG-assignment' -DisplayName 'Spe
 
 sleep 20
 
+#Az login
+. C:\LabFiles\AzureCreds.ps1
+
+$userName = $AzureUserName
+$password = $AzurePassword
+$subscriptionId = $AzureSubscriptionID
+$TenantID = $AzureTenantID
+
+
+$ODLuser = Get-AzADUser -DisplayName "ODL_User $deploymentid"
+
+$ODLuserID = $ODLuser.Id
+
+$DevBoxProjId = "/subscriptions/$SubscriptionId/resourceGroups/$RGname/providers/Microsoft.DevCenter/projects/devproject-$deploymentid"
+
+New-AzRoleAssignment -ObjectId "$ODLuserID" -Scope "$DevBoxProjId" -RoleDefinitionName "DevCenter Dev box User"
+
+sleep 10
+
+$RGname = "contoso-traders-$deploymentid"
+
+Remove-AzRoleAssignment -ObjectId "$ODLuserID" -RoleDefinitionName "Owner" -Scope "/subscriptions/$SubscriptionId/resourceGroups/$RGname"
+
+sleep 10
+
 #check bicep deployment status and cloned lab files
 
 $checkpolicy = Get-AzPolicyAssignment -Name 'spektra-policy-assignment' -Scope $rg.ResourceId
