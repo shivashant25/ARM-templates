@@ -289,6 +289,8 @@ $AKSRGname = "contoso-traders-aks-nodes-rg-$deploymentid"
 
 New-AzRoleAssignment -ObjectId "$SPobjectID" -Scope "/subscriptions/$SubscriptionId/resourceGroups/$AKSRGname" -RoleDefinitionName "Contributor"
 
+$checksprole = Get-AzRoleAssignment -ObjectId "$SPobjectID" -ResourceGroupName $AKSRGname -RoleDefinitionName "Contributor"
+
 sleep 10
 
 #check bicep deployment status and cloned lab files
@@ -326,7 +328,7 @@ Remove-AzRoleAssignment -ObjectId "$ODLuserID" -RoleDefinitionName "Owner" -Scop
 $clonefiles = Get-Item -Path 'C:\Workspaces\lab\aiw-devops-with-github-lab-files\src'
 $deploymentstatus = $RG1
 
-if(($deploymentstatus -ne $null) -and ($clonefiles -ne $null) -and ($chaspod -ne $null) -and ($checkpolicy -ne $null) -and ($checkrole -ne $null) -and ($checkaksrgpolicy -ne $null))
+if(($deploymentstatus -ne $null) -and ($clonefiles -ne $null) -and ($chaspod -ne $null) -and ($checkpolicy -ne $null) -and ($checkrole -ne $null) -and ($checkaksrgpolicy -ne $null) -and ($checksprole -ne $null))
 {
     Write-Information "Validation Passed"
     
