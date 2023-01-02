@@ -258,6 +258,7 @@ $password = $AzurePassword
 $subscriptionId = $AzureSubscriptionID
 $TenantID = $AzureTenantID
 
+$RGname = "contoso-traders-$deploymentid"
 
 $ODLuser = Get-AzADUser -DisplayName "ODL_User $deploymentid"
 
