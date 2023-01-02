@@ -305,6 +305,19 @@ $Devboxprojname = "devproject-$deploymentid"
 
 $checkrole = Get-AzRoleAssignment -ObjectId "$ODLuserID" -ResourceGroupName $RGname -ResourceName $Devboxprojname -ResourceType "Microsoft.DevCenter/projects" -RoleDefinitionName "DevCenter Dev box User"
 
+sleep 10
+
+$servicePrincipalDisplayName = "https://odl_user_sp_$deploymentid"
+$servicePrincipal = Get-AzADServicePrincipal -DisplayName $servicePrincipalDisplayName
+
+sleep 10
+
+$SPobjectID = $servicePrincipal.Id
+
+$AKSRGname = "contoso-traders-aks-nodes-rg-$deploymentid"
+
+$checksprole = Get-AzRoleAssignment -ObjectId "$SPobjectID" -ResourceGroupName $AKSRGname -RoleDefinitionName "Contributor"
+
 $AKSRGname = "contoso-traders-aks-nodes-rg-$deploymentid"
 $rg = Get-AzResourceGroup -Name $AKSRGname
 
