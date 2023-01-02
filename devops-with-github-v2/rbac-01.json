@@ -33,6 +33,8 @@
                     "Microsoft.Resources/subscriptions/resourceGroups/read",
                     "Microsoft.Sql/servers/*",
                     "Microsoft.Sql/servers/databases/*",
+					"Microsoft.Chaos/targets/write",
+					"Microsoft.Chaos/targets/capabilities/write",        
                     "Microsoft.Storage/storageAccounts/*"
                 ],
     "NotActions":  [
