@@ -269,13 +269,10 @@ New-AzRoleAssignment -ObjectId "$ODLuserID" -Scope "$DevBoxProjId" -RoleDefiniti
 
 sleep 10
 
-$RGname = "contoso-traders-$deploymentid"
-
-Remove-AzRoleAssignment -ObjectId "$ODLuserID" -RoleDefinitionName "Owner" -Scope "/subscriptions/$SubscriptionId/resourceGroups/$RGname"
-
-sleep 10
-
 #check bicep deployment status and cloned lab files
+
+$RGname = "contoso-traders-$deploymentid"
+$rg = Get-AzResourceGroup -Name $RGname
 
 $checkpolicy = Get-AzPolicyAssignment -Name 'spektra-policy-assignment' -Scope $rg.ResourceId
 
@@ -286,6 +283,8 @@ $RGname = "contoso-traders-$deploymentid"
 $RG1 = Get-AzResourceGroupDeployment -Name "createresources" -ResourceGroupName $RGname
 
 $RG1 = $RG1.ProvisioningState
+
+Remove-AzRoleAssignment -ObjectId "$ODLuserID" -RoleDefinitionName "Owner" -Scope "/subscriptions/$SubscriptionId"
 
 $clonefiles = Get-Item -Path 'C:\Workspaces\lab\aiw-devops-with-github-lab-files\src'
 $deploymentstatus = $RG1
