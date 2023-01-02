@@ -238,7 +238,7 @@ New-AzPolicyAssignment -Name 'spektra-policy-assignment' -DisplayName 'Spektra C
 
 sleep 20
 
-$AKSRGdefinition = New-AzPolicyDefinition -Name 'SpektraCustomPolicy' -DisplayName 'Spektra Custom AKS RG Policy' -Policy 'https://raw.githubusercontent.com/shivashant25/ARM-templates/main/devops-with-github-v2/policy-02.json'
+$AKSRGdefinition = New-AzPolicyDefinition -Name 'SpektraCustomAKSRGPolicy' -DisplayName 'Spektra Custom AKS RG Policy' -Policy 'https://raw.githubusercontent.com/shivashant25/ARM-templates/main/devops-with-github-v2/policy-02.json'
 
 $AKSRGname = "contoso-traders-aks-nodes-rg-$deploymentid"
 
