@@ -278,6 +278,19 @@ New-AzRoleAssignment -ObjectId "$ODLuserID" -Scope "$DevBoxProjId" -RoleDefiniti
 
 sleep 10
 
+$servicePrincipalDisplayName = "https://odl_user_sp_$deploymentid"
+$servicePrincipal = Get-AzADServicePrincipal -DisplayName $servicePrincipalDisplayName
+
+sleep 10
+
+$SPobjectID = $servicePrincipal.Id
+
+$AKSRGname = "contoso-traders-aks-nodes-rg-$deploymentid"
+
+New-AzRoleAssignment -ObjectId "$SPobjectID" -Scope "/subscriptions/$SubscriptionId/resourceGroups/$AKSRGname" -RoleDefinitionName "Contributor"
+
+sleep 10
+
 #check bicep deployment status and cloned lab files
 
 $ODLuser = Get-AzADUser -DisplayName "ODL_User $deploymentid"
