@@ -226,38 +226,6 @@ kubectl run nginx --image=nginx --restart=Never
 
 sleep 20
 
-$definition = New-AzPolicyDefinition -Name 'SpektraCustomPolicy' -DisplayName 'Spektra Custom Policy' -Policy 'https://raw.githubusercontent.com/shivashant25/ARM-templates/main/devops-with-github-v2/policy-01.json'
-
-sleep 10
-
-$RGname = "contoso-traders-$deploymentid"
-
-$rg = Get-AzResourceGroup -Name $RGname
-
-$definition = Get-AzPolicyDefinition | Where-Object { $_.Properties.DisplayName -eq 'SpektraCustomPolicy' }
-
-sleep 10
-
-New-AzPolicyAssignment -Name 'spektra-policy-assignment' -DisplayName 'Spektra Custom Policy Assignment' -Scope $rg.ResourceId -PolicyDefinition $definition
-
-sleep 20
-
-$AKSRGdefinition = New-AzPolicyDefinition -Name 'SpektraCustomAKSRGPolicy' -DisplayName 'Spektra Custom AKS RG Policy' -Policy 'https://raw.githubusercontent.com/shivashant25/ARM-templates/main/devops-with-github-v2/policy-02.json'
-
-sleep 10
-
-$AKSRGname = "contoso-traders-aks-nodes-rg-$deploymentid"
-
-$rg = Get-AzResourceGroup -Name $AKSRGname
-
-$definition = Get-AzPolicyDefinition | Where-Object { $_.Properties.DisplayName -eq 'SpektraCustomAKSRGPolicy' }
-
-sleep 10
-
-New-AzPolicyAssignment -Name 'spektra-policy-AKSRG-assignment' -DisplayName 'Spektra Custom AKS RG Policy Assignment' -Scope $rg.ResourceId -PolicyDefinition $AKSRGdefinition
-
-sleep 20
-
 #Az login
 . C:\LabFiles\AzureCreds.ps1
 
@@ -292,6 +260,38 @@ New-AzRoleAssignment -ObjectId "$SPobjectID" -Scope "/subscriptions/$Subscriptio
 $checksprole = Get-AzRoleAssignment -ObjectId "$SPobjectID" -ResourceGroupName $AKSRGname -RoleDefinitionName "Contributor"
 
 sleep 10
+
+$definition = New-AzPolicyDefinition -Name 'SpektraCustomPolicy' -DisplayName 'Spektra Custom Policy' -Policy 'https://raw.githubusercontent.com/shivashant25/ARM-templates/main/devops-with-github-v2/policy-01.json'
+
+sleep 10
+
+$RGname = "contoso-traders-$deploymentid"
+
+$rg = Get-AzResourceGroup -Name $RGname
+
+$definition = Get-AzPolicyDefinition | Where-Object { $_.Properties.DisplayName -eq 'SpektraCustomPolicy' }
+
+sleep 10
+
+New-AzPolicyAssignment -Name 'spektra-policy-assignment' -DisplayName 'Spektra Custom Policy Assignment' -Scope $rg.ResourceId -PolicyDefinition $definition
+
+sleep 20
+
+$AKSRGdefinition = New-AzPolicyDefinition -Name 'SpektraCustomAKSRGPolicy' -DisplayName 'Spektra Custom AKS RG Policy' -Policy 'https://raw.githubusercontent.com/shivashant25/ARM-templates/main/devops-with-github-v2/policy-02.json'
+
+sleep 10
+
+$AKSRGname = "contoso-traders-aks-nodes-rg-$deploymentid"
+
+$rg = Get-AzResourceGroup -Name $AKSRGname
+
+$definition = Get-AzPolicyDefinition | Where-Object { $_.Properties.DisplayName -eq 'SpektraCustomAKSRGPolicy' }
+
+sleep 10
+
+New-AzPolicyAssignment -Name 'spektra-policy-AKSRG-assignment' -DisplayName 'Spektra Custom AKS RG Policy Assignment' -Scope $rg.ResourceId -PolicyDefinition $AKSRGdefinition
+
+sleep 20
 
 #check bicep deployment status and cloned lab files
 
