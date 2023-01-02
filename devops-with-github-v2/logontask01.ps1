@@ -272,6 +272,21 @@ sleep 10
 
 #check bicep deployment status and cloned lab files
 
+$ODLuser = Get-AzADUser -DisplayName "ODL_User $deploymentid"
+
+$ODLuserID = $ODLuser.Id
+
+$RGname = "contoso-traders-$deploymentid"
+
+$Devboxprojname = "devproject-$deploymentid"
+
+$checkrole = Get-AzRoleAssignment -ObjectId "$ODLuserID" -ResourceGroupName $RGname -ResourceName $Devboxprojname -ResourceType "Microsoft.DevCenter/projects" -RoleDefinitionName "DevCenter Dev box User"
+
+$AKSRGname = "contoso-traders-aks-nodes-rg-$deploymentid"
+$rg = Get-AzResourceGroup -Name $AKSRGname
+
+$checkaksrgpolicy = Get-AzPolicyAssignment -Name 'spektra-policy-AKSRG-assignment' -Scope $rg.ResourceId
+
 $RGname = "contoso-traders-$deploymentid"
 $rg = Get-AzResourceGroup -Name $RGname
 
@@ -290,7 +305,7 @@ Remove-AzRoleAssignment -ObjectId "$ODLuserID" -RoleDefinitionName "Owner" -Scop
 $clonefiles = Get-Item -Path 'C:\Workspaces\lab\aiw-devops-with-github-lab-files\src'
 $deploymentstatus = $RG1
 
-if(($deploymentstatus -ne $null) -and ($clonefiles -ne $null) -and ($chaspod -ne $null) -and ($checkpolicy -ne $null))
+if(($deploymentstatus -ne $null) -and ($clonefiles -ne $null) -and ($chaspod -ne $null) -and ($checkpolicy -ne $null) -and ($checkrole -ne $null) -and ($checkaksrgpolicy -ne $null))
 {
     Write-Information "Validation Passed"
     
