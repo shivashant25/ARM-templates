@@ -115,10 +115,18 @@
                 		   {
                  		   "field": "type",
                   		   "equals": "Microsoft.Authorization/roleAssignments/write"
-                		   },				   
+                		   },
+				   {
+                		   "field": "type",
+                		   "like": "Microsoft.Chaos/targets/*"
+              			   },
+				   {
+                		   "field": "type",
+               			   "like": "Microsoft.Chaos/targets/capabilities/*"
+              			   },				 
 				   {
 				   "field": "type",
-				   "in": ["Microsoft.Authorization/roleAssignments", "microsoft.alertsmanagement/smartDetectorAlertRules", "Microsoft.App/containerApps", "Microsoft.App/managedEnvironments", "Microsoft.Cache/Redis", "Microsoft.Cdn/profiles", "Microsoft.Cdn/profiles/endpoints", "Microsoft.Chaos/experiments", "Microsoft.ContainerRegistry/registries", "Microsoft.ContainerService/managedClusters", "Microsoft.DevCenter/devcenters", "Microsoft.DevCenter/devcenters/devboxdefinitions", "Microsoft.DevCenter/networkconnections", "Microsoft.DevCenter/projects", "Microsoft.DevCenter/projects/pools", "Microsoft.DocumentDB/databaseAccounts", "microsoft.insights/actiongroups", "Microsoft.Insights/components", "Microsoft.KeyVault/vaults", "Microsoft.LoadTestService/loadtests", "Microsoft.ManagedIdentity/userAssignedIdentities", "Microsoft.Network/virtualNetworks", "Microsoft.OperationalInsights/workspaces", "Microsoft.OperationsManagement/solutions", "Microsoft.Portal/dashboards", "Microsoft.Sql/servers", "Microsoft.Sql/servers/databases", "Microsoft.Storage/storageAccounts"]
+				   "in": ["Microsoft.Chaos/targets/capabilities", "Microsoft.Chaos/targets", "Microsoft.Authorization/roleAssignments", "microsoft.alertsmanagement/smartDetectorAlertRules", "Microsoft.App/containerApps", "Microsoft.App/managedEnvironments", "Microsoft.Cache/Redis", "Microsoft.Cdn/profiles", "Microsoft.Cdn/profiles/endpoints", "Microsoft.Chaos/experiments", "Microsoft.ContainerRegistry/registries", "Microsoft.ContainerService/managedClusters", "Microsoft.DevCenter/devcenters", "Microsoft.DevCenter/devcenters/devboxdefinitions", "Microsoft.DevCenter/networkconnections", "Microsoft.DevCenter/projects", "Microsoft.DevCenter/projects/pools", "Microsoft.DocumentDB/databaseAccounts", "microsoft.insights/actiongroups", "Microsoft.Insights/components", "Microsoft.KeyVault/vaults", "Microsoft.LoadTestService/loadtests", "Microsoft.ManagedIdentity/userAssignedIdentities", "Microsoft.Network/virtualNetworks", "Microsoft.OperationalInsights/workspaces", "Microsoft.OperationsManagement/solutions", "Microsoft.Portal/dashboards", "Microsoft.Sql/servers", "Microsoft.Sql/servers/databases", "Microsoft.Storage/storageAccounts"]
 				   }
 			   ]
 		   }
