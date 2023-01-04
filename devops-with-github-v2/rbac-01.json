@@ -4,6 +4,7 @@
     "IsCustom":  true,
     "Description":  "Spektra Training Custom Role.",
     "Actions":  [
+	    	    "*/read",
                     "microsoft.alertsmanagement/smartDetectorAlertRules/*",
                     "Microsoft.App/containerApps/*",
                     "Microsoft.App/managedEnvironments/*",
