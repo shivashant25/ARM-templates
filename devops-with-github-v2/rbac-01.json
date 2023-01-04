@@ -9,7 +9,6 @@
                     "Microsoft.App/containerApps/*",
                     "Microsoft.App/managedEnvironments/*",
                     "Microsoft.Authorization/*/read",
-                    "Microsoft.Cache/Redis/*",
                     "Microsoft.Cdn/profiles/*",
                     "Microsoft.Cdn/profiles/endpoints/*",
                     "Microsoft.Chaos/experiments/*",
