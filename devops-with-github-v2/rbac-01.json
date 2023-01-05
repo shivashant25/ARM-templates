@@ -34,7 +34,9 @@
                     "Microsoft.Sql/servers/*",
                     "Microsoft.Sql/servers/databases/*",
 		    "Microsoft.Chaos/targets/write",
-	            "Microsoft.Chaos/targets/capabilities/write",        
+	            "Microsoft.Chaos/targets/capabilities/write",
+                    "Microsoft.Resources/deployments/validate/action",
+                    "Microsoft.Authorization/roleAssignments/write",	    
                     "Microsoft.Storage/storageAccounts/*"
                 ],
     "NotActions":  [
