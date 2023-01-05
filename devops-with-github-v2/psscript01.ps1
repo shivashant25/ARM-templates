@@ -57,6 +57,7 @@ CloudlabsManualAgent Install
 WindowsServerCommon
 InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
 CreateCredFile $AzureUserName $AzurePassword $AzureTenantID $AzureSubscriptionID $DeploymentID $azuserobjectid
+InstallModernVmValidator
 InstallChocolatey
 
 sleep 10
