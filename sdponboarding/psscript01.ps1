@@ -47,6 +47,15 @@ InstallChocolatey
 
 sleep 10
 
+#install AZ-module latest version
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+Install-Module -Name Az -Force
+
+sleep 10
+
 #Az Login
 
 . C:\LabFiles\AzureCreds.ps1
