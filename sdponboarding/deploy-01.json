@@ -475,7 +475,39 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', 'vm1nic')]"
-      ]
+      ],
+      "resources": [
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "apiVersion": "2015-06-15",
+          "name": "[concat('VM1','/', 'winExtension')]",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', 'VM1')]",
+            "[concat('Microsoft.Compute/virtualMachines/', 'VM2')]",
+            "[concat('Microsoft.Compute/virtualMachines/', 'SQLVM1')]",
+            "[concat('Microsoft.Compute/virtualMachines/', 'SQLVM2')]"
+          ],
+          "tags": {
+            "displayName": "VM Extension"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.8",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
+                "https://raw.githubusercontent.com/shivashant25/ARM-templates/main/sdponboarding/psscript01.ps1"
+              ]
+            },
+            "protectedSettings": {
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy ByPass -File psscript01.ps1', variables('cloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
+            }
+          }
+        }
+      ]    
     }
  ,
   
