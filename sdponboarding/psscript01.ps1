@@ -68,13 +68,13 @@ $tenantName = $CharArray[1]
 
 # Register SQLVM1 with 'Lightweight' SQL IaaS agent
 $RGName = SQL-EXTENSION
-$vm1 = Get-AzVM -Name SQLVM1 -ResourceGroupName $RG-Name
+$vm1 = Get-AzVM -Name SQLVM1 -ResourceGroupName $RGName
 
 New-AzSqlVM -Name $vm1.Name -ResourceGroupName $vm1.ResourceGroupName -Location $vm1.Location -LicenseType AHUB  -SqlManagementType LightWeight
 
 # Register SQLVM2 with 'Lightweight' SQL IaaS agent
 $RGName = SQL-EXTENSION
-$vm2 = Get-AzVM -Name SQLVM2 -ResourceGroupName $RG-Name
+$vm2 = Get-AzVM -Name SQLVM2 -ResourceGroupName $RGName
 
 New-AzSqlVM -Name $vm2.Name -ResourceGroupName $vm2.ResourceGroupName -Location $vm2.Location -LicenseType AHUB  -SqlManagementType LightWeight
 
