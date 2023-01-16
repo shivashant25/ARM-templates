@@ -39,9 +39,6 @@ $path=$path.Path
 $commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1"
 . $commonscriptpath
 
-#Use the commonfunction to install the required files for cloudlabsagent service 
-CloudlabsManualAgent Install
-
 # Run Imported functions from cloudlabs-windows-functions.ps1
 WindowsServerCommon
 InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
@@ -59,7 +56,6 @@ $password = $AzurePassword
 $subscriptionId = $AzureSubscriptionID
 $TenantID = $AzureTenantID
 
-
 $securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
 
@@ -71,13 +67,13 @@ $CharArray[1]
 $tenantName = $CharArray[1]
 
 # Register SQLVM1 with 'Lightweight' SQL IaaS agent
-$RG-Name = SQL-EXTENSION-$DeploymentID
+$RGName = SQL-EXTENSION-$DeploymentID
 $vm1 = Get-AzVM -Name SQLVM1 -ResourceGroupName $RG-Name
 
 New-AzSqlVM -Name $vm1.Name -ResourceGroupName $vm1.ResourceGroupName -Location $vm1.Location -LicenseType AHUB  -SqlManagementType LightWeight
 
 # Register SQLVM2 with 'Lightweight' SQL IaaS agent
-$RG-Name = SQL-EXTENSION-$DeploymentID
+$RGName = SQL-EXTENSION-$DeploymentID
 $vm2 = Get-AzVM -Name SQLVM2 -ResourceGroupName $RG-Name
 
 New-AzSqlVM -Name $vm2.Name -ResourceGroupName $vm2.ResourceGroupName -Location $vm2.Location -LicenseType AHUB  -SqlManagementType LightWeight
@@ -90,10 +86,6 @@ Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPas
 wsl --install
 (New-Object System.Net.WebClient).DownloadFile('https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi', 'C:\wsl_update_x64.msi')
 
-#Use the cloudlabs common function to write the status to validation status txt file 
-$Validstatus="Pending"  ##Failed or Successful at the last step
-$Validmessage="Post Deployment is Pending"
-CloudlabsManualAgent setStatus
 
 Stop-Transcript
 Restart-Computer -Force 
