@@ -73,7 +73,7 @@ $vm1 = Get-AzVM -Name SQLVM1 -ResourceGroupName $RG-Name
 New-AzSqlVM -Name $vm1.Name -ResourceGroupName $vm1.ResourceGroupName -Location $vm1.Location -LicenseType AHUB  -SqlManagementType LightWeight
 
 # Register SQLVM2 with 'Lightweight' SQL IaaS agent
-$RGName = SQL-EXTENSION-$DeploymentID
+$RGName = SQL-EXTENSION
 $vm2 = Get-AzVM -Name SQLVM2 -ResourceGroupName $RG-Name
 
 New-AzSqlVM -Name $vm2.Name -ResourceGroupName $vm2.ResourceGroupName -Location $vm2.Location -LicenseType AHUB  -SqlManagementType LightWeight
@@ -82,9 +82,6 @@ sleep 5
 
 Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
 
-#WSL 2 pacakage installation
-wsl --install
-(New-Object System.Net.WebClient).DownloadFile('https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi', 'C:\wsl_update_x64.msi')
 
 
 Stop-Transcript
