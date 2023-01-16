@@ -7,14 +7,18 @@
     }
   },
   "variables": {
+    
+   
     "databaseServerName": "[concat('azuresqldbserverdemo1', parameters('deploymentID'))]",
     "databaseName": "AzureSQLDB1",
     "azureTenantID": "[subscription().tenantId]",
     "azureSubscriptionID": "[subscription().subscriptionId]",
     "resourceGroupName": "[resourceGroup().name]",
     "location": "[resourceGroup().location]",
+   
     "virtualMachineSize": "Standard_D4s_v3",
     "vmPublicIpDnsName": "[concat('labvm', parameters('deploymentID'))]",
+
     "apiVersion": "[providers('Microsoft.ServiceBus', 'namespaces').apiVersions[0]]",
     "subnetPrefix": "10.0.0.0/24",
     "addressPrefix": "10.0.0.0/16",
@@ -56,12 +60,12 @@
           {
             "name": "AzureBastionSubnet",
             "properties": {
-              "addressPrefix": "[variables('bastion-subnet-ip-prefix')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'vm2nsg')]"
-              }
+                "addressPrefix": "[variables('bastion-subnet-ip-prefix')]",
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'vm2nsg')]"
+                }
             }
-          }
+        }
         ]
       },
       "dependsOn": [
@@ -74,37 +78,40 @@
       "name": "SQLExtensionDemo-vnet-bastion",
       "location": "[variables('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses', variables('public-ip-address-name'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+          "[resourceId('Microsoft.Network/publicIpAddresses', variables('public-ip-address-name'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+      
       ],
       "properties": {
-        "ipConfigurations": [
-          {
-            "name": "IpConf",
-            "properties": {
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastion-subnet-name'))]"
-              },
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('public-ip-address-name'))]"
+          "ipConfigurations": [
+              {
+                  "name": "IpConf",
+                  "properties": {
+                      "subnet": {
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastion-subnet-name'))]"
+                      },
+                      "publicIPAddress": {
+                          "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('public-ip-address-name'))]"
+                      }
+                  }
               }
-            }
-          }
-        ]
+          ]
       }
-    },
-    {
-      "apiVersion": "2020-07-01",
-      "type": "Microsoft.Network/publicIpAddresses",
-      "name": "[variables('public-ip-address-name')]",
-      "location": "[variables('location')]",
-      "sku": {
+  },
+  {
+    "apiVersion": "2020-07-01",
+    "type": "Microsoft.Network/publicIpAddresses",
+    "name": "[variables('public-ip-address-name')]",
+    "location": "[variables('location')]",
+    "sku": {
         "name": "Standard"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Static"
-      }
     },
+    "properties": {
+        "publicIPAllocationMethod": "Static"
+    }
+},
+
+    
     {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2021-04-01",
@@ -115,6 +122,8 @@
       },
       "kind": "Storage"
     },
+ 
+   
     {
       "type": "Microsoft.Network/publicIpAddresses",
       "apiVersion": "2019-02-01",
@@ -125,6 +134,7 @@
       },
       "properties": {
         "publicIpAllocationMethod": "Dynamic"
+       
       }
     },
     {
@@ -137,133 +147,145 @@
           {
             "name": "AllowHttpsInBound",
             "properties": {
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "Internet",
-              "destinationPortRange": "443",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "Internet",
+                "destinationPortRange": "443",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Inbound"
             }
-          },
-          {
+        },
+        
+        {
             "name": "AllowGatewayManagerInBound",
             "properties": {
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "GatewayManager",
-              "destinationPortRange": "443",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 111,
-              "direction": "Inbound"
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "GatewayManager",
+                "destinationPortRange": "443",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 111,
+                "direction": "Inbound"
             }
-          },
-          {
+        },
+        {
             "name": "AllowLoadBalancerInBound",
             "properties": {
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "AzureLoadBalancer",
-              "destinationPortRange": "443",
-              "destinationAddressPrefix": "*",
-              "access": "Allow",
-              "priority": 120,
-              "direction": "Inbound"
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "AzureLoadBalancer",
+                "destinationPortRange": "443",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 120,
+                "direction": "Inbound"
             }
-          },
-          {
+        },
+        {
             "name": "AllowBastionHostCommunicationInBound",
             "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": [
-                "8080",
-                "5701"
-              ],
-              "destinationAddressPrefix": "VirtualNetwork",
-              "access": "Allow",
-              "priority": 130,
-              "direction": "Inbound"
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationPortRanges": [
+                    "8080",
+                    "5701"
+                ],
+                "destinationAddressPrefix": "VirtualNetwork",
+                "access": "Allow",
+                "priority": 130,
+                "direction": "Inbound"
             }
-          },
-          {
+        },
+        {
             "name": "DenyAllInBound",
             "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationPortRange": "*",
-              "destinationAddressPrefix": "*",
-              "access": "Deny",
-              "priority": 1000,
-              "direction": "Inbound"
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationPortRange": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Deny",
+                "priority": 1000,
+                "direction": "Inbound"
             }
-          },
-          {
+        },
+        {
             "name": "AllowSshRdpOutBound",
             "properties": {
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationPortRanges": [
-                "22",
-                "3389"
-              ],
-              "destinationAddressPrefix": "VirtualNetwork",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Outbound"
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationPortRanges": [
+                    "22",
+                    "3389"
+                ],
+                "destinationAddressPrefix": "VirtualNetwork",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Outbound"
             }
-          },
-          {
+        },
+        {
             "name": "AllowAzureCloudCommunicationOutBound",
             "properties": {
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationPortRange": "443",
-              "destinationAddressPrefix": "AzureCloud",
-              "access": "Allow",
-              "priority": 110,
-              "direction": "Outbound"
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationPortRange": "443",
+                "destinationAddressPrefix": "AzureCloud",
+                "access": "Allow",
+                "priority": 110,
+                "direction": "Outbound"
             }
-          },
-          {
+        },
+        {
             "name": "AllowBastionHostCommunicationOutBound",
             "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": [
-                "8080",
-                "5701"
-              ],
-              "destinationAddressPrefix": "VirtualNetwork",
-              "access": "Allow",
-              "priority": 120,
-              "direction": "Outbound"
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "destinationPortRanges": [
+                    "8080",
+                    "5701"
+                ],
+                "destinationAddressPrefix": "VirtualNetwork",
+                "access": "Allow",
+                "priority": 120,
+                "direction": "Outbound"
             }
-          },
-          {
+        },
+        {
             "name": "AllowGetSessionInformationOutBound",
             "properties": {
-              "protocol": "*",
-              "sourcePortRange": "*",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "Internet",
-              "destinationPortRanges": [
-                "80",
-                "443"
-              ],
-              "access": "Allow",
-              "priority": 130,
-              "direction": "Outbound"
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "Internet",
+                "destinationPortRanges": [
+                    "80",
+                    "443"
+                ],
+                "access": "Allow",
+                "priority": 130,
+                "direction": "Outbound"
             }
-          },
-          {
+        },
+        {
+            "name": "DenyAllOutBound",
+            "properties": {
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Deny",
+                "priority": 1000,
+                "direction": "Outbound"
+            },
             "name": "default-allow-rdp",
             "properties": {
               "priority": 110,
@@ -276,6 +298,7 @@
               "destinationPortRange": "3389"
             }
           }
+          
         ]
       }
     },
@@ -295,11 +318,14 @@
             "name": "ipconfig1",
             "properties": {
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+                "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
               "publicIpAddress": {
                 "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', 'vm2pip')]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
               }
             }
           }
@@ -344,6 +370,7 @@
         "[resourceId('Microsoft.Network/networkInterfaces', 'vm2nic')]"
       ]
     },
+     
     {
       "type": "Microsoft.Network/publicIpAddresses",
       "apiVersion": "2019-02-01",
@@ -398,11 +425,14 @@
             "name": "ipconfig1",
             "properties": {
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+                "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
               "publicIpAddress": {
                 "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', 'vm1pip')]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
               }
             }
           }
@@ -477,301 +507,316 @@
             }
           }
         }
-      ]
-    },
-    {
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2019-02-01",
-      "name": "sqlvm1pip",
-      "location": "[variables('location')]",
-      "sku": {
-        "name": "Basic"
-      },
-      "properties": {
-        "publicIpAllocationMethod": "Dynamic"
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2017-06-01",
-      "name": "sqlvm1nsg",
-      "location": "[variables('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-rdp",
-            "properties": {
-              "priority": 110,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "3389"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2016-09-01",
-      "name": "sqlvm1nic",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIpAddresses/', 'sqlvm1pip')]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', 'sqlvm1nsg')]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
-              },
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', 'sqlvm1pip')]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', 'sqlvm1nsg')]"
+      ]    
+    }
+ ,
+  
+ {
+  "type": "Microsoft.Network/publicIpAddresses",
+  "apiVersion": "2019-02-01",
+  "name": "sqlvm1pip",
+  "location": "[variables('location')]",
+  "sku": {
+    "name": "Basic"
+  },
+  "properties": {
+    "publicIpAllocationMethod": "Dynamic"
+  }
+},
+{
+  "type": "Microsoft.Network/networkSecurityGroups",
+  "apiVersion": "2017-06-01",
+  "name": "sqlvm1nsg",
+  "location": "[variables('location')]",
+  "properties": {
+    "securityRules": [
+      {
+        "name": "default-allow-rdp",
+        "properties": {
+          "priority": 110,
+          "protocol": "TCP",
+          "access": "Allow",
+          "direction": "Inbound",
+          "sourceAddressPrefix": "*",
+          "sourcePortRange": "*",
+          "destinationAddressPrefix": "*",
+          "destinationPortRange": "3389"
         }
       }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "SQLVM1",
-      "apiVersion": "2019-07-01",
-      "location": "[variables('location')]",
-      "tags": {},
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSize')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/sqlvmdemoextension/images/SQLVM1/versions/0.0.1"
+    ]
+  }
+},
+{
+  "type": "Microsoft.Network/networkInterfaces",
+  "apiVersion": "2016-09-01",
+  "name": "sqlvm1nic",
+  "location": "[variables('location')]",
+  "dependsOn": [
+    "[concat('Microsoft.Network/publicIpAddresses/', 'sqlvm1pip')]",
+    "[concat('Microsoft.Network/networkSecurityGroups/', 'sqlvm1nsg')]",
+    "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+  ],
+  "properties": {
+    "ipConfigurations": [
+      {
+        "name": "ipconfig1",
+        "properties": {
+          "subnet": {
+            "id": "[variables('subnetRef')]"
           },
-          "osDisk": {
-            "createOption": "fromImage",
-            "name": "[concat('SQLVM1','OSDisk')]",
-            "diskSizeGB": 128,
-            "managedDisk": {
-              "storageAccountType": "Standard_LRS"
-            }
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces/', 'sqlvm1nic')]"
-            }
-          ]
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces/', 'sqlvm1nic')]"
-      ]
-    },
-    {
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2019-02-01",
-      "name": "SQLVM2PIP",
-      "location": "[variables('location')]",
-      "sku": {
-        "name": "Basic"
-      },
-      "properties": {
-        "publicIpAllocationMethod": "Dynamic"
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2017-06-01",
-      "name": "SQLVM2NSG",
-      "location": "[variables('location')]",
-      "properties": {
-        "securityRules": [
-          {
-            "name": "default-allow-rdp",
-            "properties": {
-              "priority": 110,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "3389"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2016-09-01",
-      "name": "SQLVM2nic",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIpAddresses/', 'SQLVM2pip')]",
-        "[concat('Microsoft.Network/networkSecurityGroups/', 'SQLVM2nsg')]",
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
-              },
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', 'SQLVM2pip')]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', 'SQLVM2nsg')]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "SQLVM2",
-      "apiVersion": "2019-07-01",
-      "location": "[variables('location')]",
-      "tags": {},
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('virtualMachineSize')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/sqlvmdemoextension/images/SQLVM2/versions/0.0.1"
+          "privateIPAllocationMethod": "Dynamic",
+          "publicIpAddress": {
+            "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', 'sqlvm1pip')]"
           },
-          "osDisk": {
-            "createOption": "fromImage",
-            "name": "[concat('SQLVM2','OSDisk')]",
-            "diskSizeGB": 128,
-            "managedDisk": {
-              "storageAccountType": "Standard_LRS"
-            }
+          "subnet": {
+            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
           }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'SQLVM2nic')]"
-            }
-          ]
         }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', 'SQLVM2nic')]"
-      ]
+      }
+    ],
+    "networkSecurityGroup": {
+      "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', 'sqlvm1nsg')]"
+    }
+  }
+},
+{
+  "type": "Microsoft.Compute/virtualMachines",
+  "name": "SQLVM1",
+  "apiVersion": "2019-07-01",
+  "location": "[variables('location')]",
+  "tags": {},
+  "properties": {
+    "hardwareProfile": {
+      "vmSize": "[variables('virtualMachineSize')]"
     },
-    {
-      "type": "Microsoft.OperationalInsights/workspaces",
-      "apiVersion": "2021-12-01-preview",
-      "name": "SQLIaaSLAWS",
-      "location": "[variables('location')]",
-      "properties": {
-        "sku": {
-          "name": "pergb2018"
-        },
-        "retentionInDays": 30,
-        "features": {
-          "enableLogAccessUsingOnlyResourcePermissions": true
-        },
-        "workspaceCapping": {
-          "dailyQuotaGb": -1
-        },
-        "publicNetworkAccessForIngestion": "Enabled",
-        "publicNetworkAccessForQuery": "Enabled"
+    "storageProfile": {
+      "imageReference": {
+        "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/sqlvmdemoextension/images/SQLVM1/versions/0.0.1"
+      },
+      "osDisk": {
+        "createOption": "fromImage",
+        "name": "[concat('SQLVM1','OSDisk')]",
+        "diskSizeGB": 128,
+        "managedDisk": {
+          "storageAccountType": "Standard_LRS"
+        }
       }
     },
-    {
-      "type": "Microsoft.Sql/servers",
-      "apiVersion": "2021-02-01-preview",
-      "name": "[variables('databaseServerName')]",
-      "location": "[variables('location')]",
-      "properties": {
-        "administratorLogin": "Admin123",
-        "administratorLoginPassword": "SuperStrong@1",
-        "version": "12.0",
-        "minimalTlsVersion": "1.2",
-        "publicNetworkAccess": "Enabled",
-        "restrictOutboundNetworkAccess": "Disabled"
-      },
-      "resources": [
+    "networkProfile": {
+      "networkInterfaces": [
         {
-          "name": "AllowAllMicrosoftAzureIps",
-          "type": "firewallrules",
-          "apiVersion": "2014-04-01",
-          "location": "[variables('location')]",
-          "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
-          },
-          "dependsOn": [
-            "[variables('databaseServerName')]"
-          ]
-        }
-      ]
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases",
-      "apiVersion": "2021-02-01-preview",
-      "name": "[concat(string(variables('databaseServerName')), '/', string('AzureSQLDB1'))]",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Sql/servers/', variables('databaseServerName'))]"
-      ],
-      "sku": {
-        "name": "GP_Gen5",
-        "tier": "GeneralPurpose",
-        "family": "Gen5",
-        "capacity": 2
-      },
-      "kind": "v12.0,user,vcore",
-      "properties": {
-        "collation": "SQL_Latin1_General_CP1_CI_AS",
-        "maxSizeBytes": 34359738368,
-        "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-        "zoneRedundant": false,
-        "licenseType": "LicenseIncluded",
-        "readScale": "Disabled",
-        "requestedBackupStorageRedundancy": "Local",
-        "isLedgerOn": false
-      },
-      "resources": [
-        {
-          "type": "extensions",
-          "apiVersion": "2014-04-01",
-          "name": "Import",
-          "dependsOn": [
-            "[variables('databaseName')]"
-          ],
-          "properties": {
-            "storageKeyType": "StorageAccessKey",
-            "storageKey": "7yf+h/aJ8mCvOstNctdflr/hP4tL3vn9JWJi/+KpyOzEin6c3NEOUWE9sIRd57Eo0F+QjVarag7c+AStmF0jwg==",
-            "storageUri": "https://sqldemostorageacnt.blob.core.windows.net/sql/AzureSQLDB1.bacpac",
-            "administratorLogin": "Admin123",
-            "administratorLoginPassword": "SuperStrong@1",
-            "operationMode": "Import"
-          }
+          "id": "[resourceId('Microsoft.Network/networkInterfaces/', 'sqlvm1nic')]"
         }
       ]
     }
+  },
+  "dependsOn": [
+    "[resourceId('Microsoft.Network/networkInterfaces/', 'sqlvm1nic')]"
+  ]
+}
+,
+
+{
+  "type": "Microsoft.Network/publicIpAddresses",
+  "apiVersion": "2019-02-01",
+  "name": "SQLVM2PIP",
+  "location": "[variables('location')]",
+  "sku": {
+    "name": "Basic"
+  },
+  "properties": {
+    "publicIpAllocationMethod": "Dynamic"
+  }
+},
+{
+  "type": "Microsoft.Network/networkSecurityGroups",
+  "apiVersion": "2017-06-01",
+  "name": "SQLVM2NSG",
+  "location": "[variables('location')]",
+  "properties": {
+    "securityRules": [
+      {
+        "name": "default-allow-rdp",
+        "properties": {
+          "priority": 110,
+          "protocol": "TCP",
+          "access": "Allow",
+          "direction": "Inbound",
+          "sourceAddressPrefix": "*",
+          "sourcePortRange": "*",
+          "destinationAddressPrefix": "*",
+          "destinationPortRange": "3389"
+        }
+      }
+    ]
+  }
+},
+{
+  "type": "Microsoft.Network/networkInterfaces",
+  "apiVersion": "2016-09-01",
+  "name": "SQLVM2nic",
+  "location": "[variables('location')]",
+  "dependsOn": [
+    "[concat('Microsoft.Network/publicIpAddresses/', 'SQLVM2pip')]",
+    "[concat('Microsoft.Network/networkSecurityGroups/', 'SQLVM2nsg')]",
+    "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+  ],
+  "properties": {
+    "ipConfigurations": [
+      {
+        "name": "ipconfig1",
+        "properties": {
+          "subnet": {
+            "id": "[variables('subnetRef')]"
+          },
+          "privateIPAllocationMethod": "Dynamic",
+          "publicIpAddress": {
+            "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', 'SQLVM2pip')]"
+          },
+          "subnet": {
+            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+          }
+        }
+      }
+    ],
+    "networkSecurityGroup": {
+      "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', 'SQLVM2nsg')]"
+    }
+  }
+},
+{
+  "type": "Microsoft.Compute/virtualMachines",
+  "name": "SQLVM2",
+  "apiVersion": "2019-07-01",
+  "location": "[variables('location')]",
+  "tags": {},
+  "properties": {
+    "hardwareProfile": {
+      "vmSize": "[variables('virtualMachineSize')]"
+    },
+    "storageProfile": {
+      "imageReference": {
+        "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/sqlvmdemoextension/images/SQLVM2/versions/0.0.1"
+      },
+      "osDisk": {
+        "createOption": "fromImage",
+        "name": "[concat('SQLVM2','OSDisk')]",
+        "diskSizeGB": 128,
+        "managedDisk": {
+          "storageAccountType": "Standard_LRS"
+        }
+      }
+    },
+    "networkProfile": {
+      "networkInterfaces": [
+        {
+          "id": "[resourceId('Microsoft.Network/networkInterfaces', 'SQLVM2nic')]"
+        }
+      ]
+    }
+  },
+  "dependsOn": [
+    "[resourceId('Microsoft.Network/networkInterfaces', 'SQLVM2nic')]"
+  ]
+},
+
+{
+  "type": "Microsoft.OperationalInsights/workspaces",
+  "apiVersion": "2021-12-01-preview",
+  "name": "SQLIaaSLAWS",
+  "location": "[variables('location')]",
+  
+  "properties": {
+      "sku": {
+          "name": "pergb2018"
+      },
+      "retentionInDays": 30,
+      "features": {
+          "enableLogAccessUsingOnlyResourcePermissions": true
+      },
+      "workspaceCapping": {
+          "dailyQuotaGb": -1
+      },
+      "publicNetworkAccessForIngestion": "Enabled",
+      "publicNetworkAccessForQuery": "Enabled"
+  }
+},
+{
+  "type": "Microsoft.Sql/servers",
+  "apiVersion": "2021-02-01-preview",
+  "name": "[variables('databaseServerName')]",
+  "location": "[variables('location')]",
+  "properties": {
+    "administratorLogin": "Admin123",
+    "administratorLoginPassword": "SuperStrong@1",
+    "version": "12.0",
+    "minimalTlsVersion": "1.2",
+    "publicNetworkAccess": "Enabled",
+    "restrictOutboundNetworkAccess": "Disabled"
+  },
+  "resources": [
+  
+    {
+      "name": "AllowAllMicrosoftAzureIps",
+      "type": "firewallrules",
+      "apiVersion": "2014-04-01",
+      "location": "[variables('location')]",
+      "properties": {
+        "endIpAddress": "0.0.0.0",
+        "startIpAddress": "0.0.0.0"
+      },
+      "dependsOn": [
+        "[variables('databaseServerName')]"
+      ]
+    }
+  ]
+},
+
+
+{
+  "type": "Microsoft.Sql/servers/databases",
+  "apiVersion": "2021-02-01-preview",
+  "name": "[concat(string(variables('databaseServerName')), '/', string('AzureSQLDB1'))]",
+  "location": "[variables('location')]",
+  "dependsOn": [
+    "[concat('Microsoft.Sql/servers/', variables('databaseServerName'))]"
+  ],
+  "sku": {
+    "name": "GP_Gen5",
+    "tier": "GeneralPurpose",
+    "family": "Gen5",
+    "capacity": 2
+},
+"kind": "v12.0,user,vcore",
+  "properties": {
+    "collation": "SQL_Latin1_General_CP1_CI_AS",
+    "maxSizeBytes": 34359738368,
+    "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+    "zoneRedundant": false,
+    "licenseType": "LicenseIncluded",
+    "readScale": "Disabled",
+    "requestedBackupStorageRedundancy": "Local",
+    "isLedgerOn": false
+  },
+  "resources": [
+    {
+      "type": "extensions",
+      "apiVersion": "2014-04-01",
+      "name": "Import",
+      "dependsOn": [
+        "[variables('databaseName')]"  ],
+      "properties": {
+        
+        "storageKeyType": "StorageAccessKey",
+        "storageKey":  "7yf+h/aJ8mCvOstNctdflr/hP4tL3vn9JWJi/+KpyOzEin6c3NEOUWE9sIRd57Eo0F+QjVarag7c+AStmF0jwg==",
+        "storageUri": "https://sqldemostorageacnt.blob.core.windows.net/sql/AzureSQLDB1.bacpac",
+        "administratorLogin": "Admin123",
+        "administratorLoginPassword": "SuperStrong@1",
+        "operationMode": "Import"
+      }
+    }
+  ]
+}
   ],
   "outputs": {
     "DeploymentID": {
