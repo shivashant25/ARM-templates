@@ -347,7 +347,7 @@
         },
         "storageProfile": {
           "imageReference": {
-            "id": "/subscriptions/60e548e6-3926-4052-9703-38d9f7612875/resourceGroups/aec-mgmt-rg/providers/Microsoft.Compute/galleries/sqlvmdemoSIG/images/V2/versions/0.0.1"
+            "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/sqlvmdemoextension/images/VM2/versions/0.0.1"
           },
           "osDisk": {
             "createOption": "fromImage",
@@ -454,7 +454,7 @@
         },
         "storageProfile": {
           "imageReference": {
-            "id": "/subscriptions/60e548e6-3926-4052-9703-38d9f7612875/resourceGroups/aec-mgmt-rg/providers/Microsoft.Compute/galleries/sqlvmdemoSIG/images/VM1/versions/0.0.1"
+            "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/sqlvmdemoextension/images/VM1/versions/0.0.1"
           },
           "osDisk": {
             "createOption": "fromImage",
@@ -559,7 +559,7 @@
     },
     "storageProfile": {
       "imageReference": {
-        "id": "/subscriptions/60e548e6-3926-4052-9703-38d9f7612875/resourceGroups/aec-mgmt-rg/providers/Microsoft.Compute/galleries/sqlvmdemoSIG/images/SQLVM1"
+        "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/sqlvmdemoextension/images/SQLVM1/versions/0.0.1"
       },
       "osDisk": {
         "createOption": "fromImage",
@@ -583,7 +583,7 @@
   ]
 }
 ,
- 
+
 {
   "type": "Microsoft.Network/publicIpAddresses",
   "apiVersion": "2019-02-01",
@@ -664,7 +664,7 @@
     },
     "storageProfile": {
       "imageReference": {
-        "id": "/subscriptions/60e548e6-3926-4052-9703-38d9f7612875/resourceGroups/aec-mgmt-rg/providers/Microsoft.Compute/galleries/sqlvmdemoSIG/images/sqlvm2/versions/0.0.1"
+        "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/sqlvmdemoextension/images/SQLVM2/versions/0.0.1"
       },
       "osDisk": {
         "createOption": "fromImage",
