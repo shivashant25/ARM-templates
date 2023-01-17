@@ -1,0 +1,48 @@
+﻿[
+  {
+    "ResourceType": "Microsoft.Compute/virtualMachines",
+    "Parameter": [
+      {
+        "Name": "max-cpu-cores",
+        "Value": "4"
+      }
+    ]
+  },
+  {
+    "ResourceType": "Microsoft.Compute/disks",
+    "Parameter": [
+      {
+        "Name": "max-count",
+        "Value": "8"
+      }
+    ]
+  },  
+  {
+    "ResourceType": "Microsoft.Network/publicIPAddresses",
+    "Parameter": [
+      {
+        "Name": "max-count",
+        "Value": "5"
+      }
+    ]
+  },
+  {
+    "ResourceType": "Microsoft.Sql/servers/databases",
+    "Parameter": [
+        {
+            "Name": "max-VCores",
+            "Value": "2"
+        }
+    ]
+},     
+  {
+    "ResourceType": "Microsoft.Network/bastionHosts",
+    "Parameter": [
+      {
+        "Name": "max-count",
+        "Value": "1"
+      }
+    ]
+  }
+]
+
