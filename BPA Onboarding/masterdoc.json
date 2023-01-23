@@ -1,0 +1,18 @@
+[
+    {
+      "Name": "Business Process Automation",
+      "Language": "English",
+      "BaseURL": "https://github.com/markremmey/sdp-workshop",
+      "Files": [
+                
+        {
+          "RawFilePath": "https://raw.githubusercontent.com/shivashant25/sdp-workshop/main/lab_instructions/lab_1.md",
+          "Order": 1
+        },
+          {
+          "RawFilePath": "https://raw.githubusercontent.com/shivashant25/sdp-workshop/main/lab_instructions/lab_2.md",
+          "Order": 2
+        }
+      ]
+    }
+  ]
