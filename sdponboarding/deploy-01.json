@@ -36,6 +36,8 @@
     "cloudlabsCommon": "[concat(' -AzureUserName ', parameters('AzureUserName'), ' -AzurePassword ', parameters('AzurePassword'), ' -AzureTenantID ', variables('AzureTenantID'), ' -AzureSubscriptionID ', variables('AzureSubscriptionID'), ' -ODLID ', parameters('ODLID'), ' -DeploymentID ', parameters('DeploymentID'), ' -InstallCloudLabsShadow ', parameters('InstallCloudLabsShadow'), ' -vmAdminPassword ', parameters('vmAdminPassword'))]",
     "Enable-CloudLabsEmbeddedShadow": "[concat(' -vmAdminUsername ', parameters('vmAdminUsername'), ' -trainerUserName ', parameters('trainerUserName'), ' -trainerUserPassword ', parameters('trainerUserPassword'))]",
     "location": "[resourceGroup().location]",
+    "AzureSubscriptionID": "[subscription().subscriptionId]",
+    "AzureTenantID": "[subscription().tenantId]",    
     "virtualMachineSize": "Standard_D4s_v3",
     "subnetPrefix": "10.0.0.0/24",
     "addressPrefix": "10.0.0.0/16",
@@ -344,7 +346,7 @@
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy ByPass -File sql-extension/scripts/psscript-01.ps1', variables('cloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy ByPass -File psscript-01.ps1', variables('cloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
         }
       }
     },    
