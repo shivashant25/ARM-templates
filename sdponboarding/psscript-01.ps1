@@ -40,7 +40,6 @@ $commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1
 . $commonscriptpath
 
 # Run Imported functions from cloudlabs-windows-functions.ps1
-WindowsServerCommon
 InstallCloudLabsShadow $ODLID $InstallCloudLabsShadow
 CreateCredFile $AzureUserName $AzurePassword $AzureTenantID $AzureSubscriptionID $DeploymentID $azuserobjectid
 InstallChocolatey
