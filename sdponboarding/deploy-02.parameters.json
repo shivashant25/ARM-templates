@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "AzureUserName": {
-      "value": "GET-AZUSER-UPN"
+      "value": "azureusername"
     },
     "DeploymentID": {
-      "value": "GET-DEPLOYMENT-ID"
+      "value": "deploymentidvalue"
     }
   }
 }
