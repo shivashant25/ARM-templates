@@ -80,32 +80,21 @@ $path = "C:\Workspaces\lab\aiw-devops-with-github-lab-files\iac"
 
 sleep 5
 
-. C:\LabFiles\AzureCreds.ps1
-
-$userName = $AzureUserName
-$password = $AzurePassword
-$subscriptionId = $AzureSubscriptionID
-$TenantID = $AzureTenantID
-
-$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
-
-Connect-AzAccount -Credential $cred | Out-Null
-
-$Inputstring = $AzureUserName
-$CharArray =$InputString.Split("@")
-$CharArray[1]
-$tenantName = $CharArray[1]
-
-cd C:\Packages
-
-$RGname = "PowerBI-Embedded-RG"
-
-New-AzResourceGroupDeployment -Name "createresources" -TemplateFile "deploy-02.json" -TemplateParameterFile "deploy-02.parameters.json" -ResourceGroup $RGname
-
-sleep 5
-
 Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
+
+#Enable Autologon
+$AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoAdminLogon" -Value "1" -type String 
+Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultUsername" -Value "$($env:ComputerName)\demouser" -type String  
+Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "$vmAdminPassword" -type String
+Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
+
+
+# Scheduled Task to Run PostConfig.ps1 screen on logon
+$Trigger= New-ScheduledTaskTrigger -AtLogOn
+$User= "$($env:ComputerName)\$adminUsername" 
+$Action= New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File C:\Packages\logontask.ps1"
+Register-ScheduledTask -TaskName "logontask" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force
 
 Stop-Transcript
 Restart-Computer -Force 
