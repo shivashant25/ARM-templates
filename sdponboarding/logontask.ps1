@@ -7,6 +7,28 @@ $commonscriptpath = "C:\Packages\Plugins\Microsoft.Compute.CustomScriptExtension
 
 $DeploymentID = $env:DeploymentID
 
+. C:\LabFiles\AzureCreds.ps1
+
+$userName = $AzureUserName
+$password = $AzurePassword
+$subscriptionId = $AzureSubscriptionID
+$TenantID = $AzureTenantID
+
+$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
+$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
+
+Connect-AzAccount -Credential $cred | Out-Null
+
+$Inputstring = $AzureUserName
+$CharArray =$InputString.Split("@")
+$CharArray[1]
+$tenantName = $CharArray[1]
+
+cd C:\Packages
+
+$RGname = "PowerBI-Embedded-RG"
+
+New-AzResourceGroupDeployment -Name "createresources" -TemplateFile "deploy-02.json" -TemplateParameterFile "deploy-02.parameters.json" -ResourceGroup $RGname
 
 
 sleep 5
