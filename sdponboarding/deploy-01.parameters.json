@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmAdminUsername": {
-      "value": "demouser"
+      "value": "hacker1"
     },
     "vmAdminPassword": {
-      "value": "GEN-PASSWORD"
+      "value": "Machinelearning!234"
     },
     "AzureUserName": {
       "value": "GET-AZUSER-UPN"
@@ -21,10 +21,10 @@
       "value": "GET-DEPLOYMENT-ID"
     },
     "trainerUserName": {
-      "value": "trainer"
+      "value": "hacker1"
     },
     "trainerUserPassword": {
-      "value": "GEN-PASSWORD"
+      "value": "Machinelearning!234"
     }
   }
 }
