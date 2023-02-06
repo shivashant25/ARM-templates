@@ -1,23 +1,50 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "vmAdminUsername": {
+      "type": "string"
+    },
+    "vmAdminPassword": {
+      "type": "SecureString"
+    },
+    "trainerUserName": {
+      "type": "string"
+    },
+    "trainerUserPassword": {
+      "type": "string"
+    },
+    "ODLID": {
+      "type": "string"
+    },
     "AzureUserName": {
       "type": "string"
     },
+    "AzurePassword": {
+      "type": "securestring"
+    },
     "deploymentID": {
       "type": "String"
+    },
+    "InstallCloudLabsShadow": {
+
+      "type": "string",
+      "defaultvalue": "yes"
     }
   },
   "variables": {
+    "cloudlabsCommon": "[concat(' -AzureUserName ', parameters('AzureUserName'), ' -AzurePassword ', parameters('AzurePassword'), ' -AzureTenantID ', variables('AzureTenantID'), ' -AzureSubscriptionID ', variables('AzureSubscriptionID'), ' -ODLID ', parameters('ODLID'), ' -DeploymentID ', parameters('DeploymentID'), ' -InstallCloudLabsShadow ', parameters('InstallCloudLabsShadow'), ' -vmAdminPassword ', parameters('vmAdminPassword'))]",
+    "Enable-CloudLabsEmbeddedShadow": "[concat(' -vmAdminUsername ', parameters('vmAdminUsername'), ' -trainerUserName ', parameters('trainerUserName'), ' -trainerUserPassword ', parameters('trainerUserPassword'))]",
     "location": "[resourceGroup().location]",
+    "AzureSubscriptionID": "[subscription().subscriptionId]",
+    "AzureTenantID": "[subscription().tenantId]",    
     "virtualMachineSize": "Standard_D4s_v3",
+   "dnsNameForPublicIP": "[concat('hackervm-', uniqueString(resourceGroup().id))]",     
+    "publicIPAddressName": "hackervmpip",    
     "subnetPrefix": "10.0.0.0/24",
-    "publicIPAddressName": "hackervmpip",
     "addressPrefix": "10.0.0.0/16",
     "virtualNetworkName": "powerbi-vnet",
     "SubnetName": "powerbiSubnet",
-   "dnsNameForPublicIP": "[concat('labvm-', uniqueString(resourceGroup().id))]",    
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
     "capacities_pbiembed_name": "[concat('pbiembed', parameters('deploymentID'))]",
     "bastion-subnet-ip-prefix": "10.0.1.0/26"
@@ -85,6 +112,7 @@
               "direction": "Inbound"
             }
           },
+
           {
             "name": "AllowGatewayManagerInBound",
             "properties": {
@@ -202,6 +230,17 @@
             }
           },
           {
+            "name": "DenyAllOutBound",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Deny",
+              "priority": 1000,
+              "direction": "Outbound"
+            },
             "name": "default-allow-rdp",
             "properties": {
               "priority": 110,
@@ -214,6 +253,7 @@
               "destinationPortRange": "3389"
             }
           }
+
         ]
       }
     },
@@ -233,11 +273,14 @@
             "name": "ipconfig1",
             "properties": {
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+                "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
               "publicIpAddress": {
                 "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', variables('publicIPAddressName'))]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
               }
             }
           }
@@ -282,6 +325,33 @@
         "[resourceId('Microsoft.Network/networkInterfaces', 'hackervmnic')]"
       ]
     },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2015-06-15",
+      "name": "[concat('VM1','/', 'winExtension')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', 'hackervm')]"
+      ],
+      "tags": {
+        "displayName": "VM Extension"
+      },
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.8",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
+            "https://experienceazure.blob.core.windows.net/templates/sql-extension/scripts/psscript-01.ps1"
+          ]
+        },
+        "protectedSettings": {
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy ByPass -File psscript-01.ps1', variables('cloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
+        }
+      }
+    },    
     {
       "type": "Microsoft.PowerBIDedicated/capacities",
       "apiVersion": "2021-01-01",
