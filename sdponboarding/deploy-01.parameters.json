@@ -21,10 +21,10 @@
       "value": "GET-DEPLOYMENT-ID"
     },
     "trainerUserName": {
-      "value": "hacker1"
+      "value": "trainer"
     },
     "trainerUserPassword": {
-      "value": "Machinelearning!234"
+      "value": "GEN-PASSWORD"
     }
   }
 }
