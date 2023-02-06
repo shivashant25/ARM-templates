@@ -328,7 +328,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "apiVersion": "2015-06-15",
-      "name": "[concat('VM1','/', 'winExtension')]",
+      "name": "[concat('hackervm','/', 'winExtension')]",
       "location": "[variables('location')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', 'hackervm')]"
