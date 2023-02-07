@@ -351,14 +351,38 @@
           "commandToExecute": "[concat('powershell.exe -ExecutionPolicy ByPass -File psscript-01.ps1', variables('cloudlabsCommon'), variables('Enable-CloudLabsEmbeddedShadow'))]"
         }
       }
-    }   
+    },
+    {
+      "type": "Microsoft.PowerBIDedicated/capacities",
+      "apiVersion": "2021-01-01",
+      "name": "[variables('capacities_pbiembed_name')]",
+      "location": "[variables('location')]",
+      "tags": {
+        "ms-resource-usage": "PBI Embed",
+        "Owner": "Alp Kaya",
+        "Service": "PowerBI",
+        "Type": "Workshop"
+      },
+      "sku": {
+        "name": "A1",
+        "tier": "PBIE_Azure"
+      },
+      "properties": {
+        "mode": "Gen2",
+        "administration": {
+          "members": [
+            "[ parameters('AzureUserName')]"
+          ]
+        }
+      }
+    }    
   ],
   "outputs": {
     "DeploymentID": {
       "type": "string",
       "value": "[ parameters('deploymentID')]"
     },
-    "VM DNS Name": {
+    "Jump VM DNS Name": {
       "type": "string",
       "value": "[reference(variables('publicIPAddressName'), '2016-03-30').dnsSettings.fqdn]"
     },
