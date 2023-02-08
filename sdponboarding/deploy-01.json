@@ -356,7 +356,7 @@
       "type": "Microsoft.PowerBIDedicated/capacities",
       "apiVersion": "2021-01-01",
       "name": "[variables('capacities_pbiembed_name')]",
-      "location": "[variables('location')]",
+      "location": "Central US",
       "tags": {
         "ms-resource-usage": "PBI Embed",
         "Owner": "Alp Kaya",
