@@ -6,7 +6,7 @@
       "type": "string"
     },
     "vmAdminPassword": {
-      "type": "SecureString"
+      "type": "string"
     },
     "trainerUserName": {
       "type": "string"
