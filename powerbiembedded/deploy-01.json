@@ -388,11 +388,11 @@
     },
     "VM Admin Username": {
       "type": "string",
-      "value": "hacker1"
+      "value": "[parameters('vmAdminUsername')]"
     },
     "VM Admin Password": {
       "type": "string",
-      "value": "Machinelearning!234"
+      "value": "[parameters('vmAdminPassword')]"
     }
   }
 }
