@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "AzureUserName": {
+        "type": "string"
+      },
+      "deploymentID": {
+        "type": "String"
+      }
+    },
+    "variables": {
+      "capacities_pbiembed_name": "[concat('pbiembed', parameters('deploymentID'))]"
+    },
+    "resources": [   
+      {
+        "type": "Microsoft.PowerBIDedicated/capacities",
+        "apiVersion": "2021-01-01",
+        "name": "[variables('capacities_pbiembed_name')]",
+        "location": "[resourceGroup().location]",
+        "tags": {
+          "ms-resource-usage": "PBI Embed",
+          "Owner": "Alp Kaya",
+          "Service": "PowerBI",
+          "Type": "Workshop"
+        },
+        "sku": {
+          "name": "A1",
+          "tier": "PBIE_Azure"
+        },
+        "properties": {
+          "mode": "Gen2",
+          "administration": {
+            "members": [
+              "[ parameters('AzureUserName')]"
+            ]
+          }
+        }
+      }
+    ]
+  }
+  
