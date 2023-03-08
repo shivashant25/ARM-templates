@@ -344,7 +344,7 @@
         "settings": {
           "fileUris": [
             "https://experienceazure.blob.core.windows.net/templates/cloudlabs-common/cloudlabs-windows-functions.ps1",
-            "https://raw.githubusercontent.com/shivashant25/ARM-templates/main/sdponboarding/psscript-01.ps1"
+            "https://raw.githubusercontent.com/shivashant25/ARM-templates/main/powerbiembedded/psscript-01.ps1"
           ]
         },
         "protectedSettings": {
