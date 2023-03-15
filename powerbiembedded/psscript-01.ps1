@@ -63,11 +63,11 @@ sleep 5
 
 cd C:\LabFiles
 
-(New-Object Net.WebClient).DownloadFile("https://github.com/CloudLabsAI-Azure/PowerBI-Embedded/blob/main/Lab_Guide/labfiles/Wingtip%20Sales%20Analysis.pbix", "C:\LabFiles\Wingtip Sales Analysis.pbix")
+(New-Object Net.WebClient).DownloadFile("https://pbiembeddedlabfiles23.blob.core.windows.net/pbi-report/Wingtip Sales Analysis.pbix", "C:\LabFiles\Wingtip Sales Analysis.pbix")
 
-(New-Object Net.WebClient).DownloadFile("https://github.com/CloudLabsAI-Azure/PowerBI-Embedded/blob/main/Lab_Guide/labfiles/Sales%20%26%20Returns%20Sample%20without%20RLS.pbix", "C:\LabFiles\Sales & Returns Sample without RLS.pbix")
+(New-Object Net.WebClient).DownloadFile("https://pbiembeddedlabfiles23.blob.core.windows.net/pbi-report/Sales & Returns Sample without RLS.pbix", "C:\LabFiles\Sales & Returns Sample without RLS.pbix")
 
-(New-Object Net.WebClient).DownloadFile("https://github.com/CloudLabsAI-Azure/PowerBI-Embedded/blob/main/Lab_Guide/labfiles/Sales%20%26%20Returns%20Sample%20with%20RLS.pbix", "C:\LabFiles\Sales & Returns Sample with RLS.pbix")
+(New-Object Net.WebClient).DownloadFile("https://pbiembeddedlabfiles23.blob.core.windows.net/pbi-report/Sales & Returns Sample with RLS.pbix", "C:\LabFiles\Sales & Returns Sample with RLS.pbix")
 
 #Az login
 . C:\LabFiles\AzureCreds.ps1
