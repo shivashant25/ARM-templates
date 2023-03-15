@@ -90,6 +90,28 @@ $PBID = (Get-PowerBIWorkspace).Id
 
 New-PowerBIReport -Path 'C:\LabFiles\Wingtip Sales Analysis.pbix' -Name 'Wingtip Sales Analysis' -WorkspaceId $PBID
 
+sleep 5
+
+$salesreport = Get-PowerBIReport -Name 'Wingtip Sales Analysis' -WorkspaceId $PBID
+
+sleep 5
+
+$reportid = $salesreport.Id
+
+$datasetid = $salesreport.DatasetId
+
+cd C:\LabFiles
+
+New-Item C:\LabFiles\workspacedetails.txt
+
+Add-Content C:\LabFiles\workspacedetails.txt "workspaceID= $PBID"
+
+Add-Content C:\LabFiles\workspacedetails.txt "reportID= $reportid"
+
+Add-Content C:\LabFiles\workspacedetails.txt "datasetID= $datasetid"
+
+sleep 5
+
 Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
 
 Stop-Transcript
