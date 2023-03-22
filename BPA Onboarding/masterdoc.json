@@ -6,12 +6,18 @@
       "Files": [
                 
         {
-          "RawFilePath": "https://raw.githubusercontent.com/shivashant25/sdp-workshop/main/lab_instructions/lab_1.md",
+          "RawFilePath": "https://raw.githubusercontent.com/markremmey/sdp-workshop/main/lab_instructions/lab_1.md",
           "Order": 1
         },
           {
-          "RawFilePath": "https://raw.githubusercontent.com/shivashant25/sdp-workshop/main/lab_instructions/lab_2.md",
+          "RawFilePath": "https://raw.githubusercontent.com/markremmey/sdp-workshop/main/lab_instructions/lab_2.md",
           "Order": 2
+        },
+        
+          {
+          "RawFilePath": "https://raw.githubusercontent.com/markremmey/sdp-workshop/main/lab_instructions/lab_3.md",
+          "Order": 3
+        }
         }
       ]
     }
