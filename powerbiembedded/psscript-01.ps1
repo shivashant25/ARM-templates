@@ -112,6 +112,21 @@ Add-Content C:\LabFiles\workspacedetails.txt "datasetID= $datasetid"
 
 sleep 5
 
+$path = "C:\Users\hacker1\Desktop\hacker\Power BI Embedded workshop_latest"
+(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "42c563a4-2575-42a1-992e-9bebb8588971", "<client id>"} | Set-Content -Path "$path\appsettings.json"
+
+(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "2a1ab401-76ec-42b7-bc31-6ac0fa26600c", "<tenant id>"} | Set-Content -Path "$path\appsettings.json"
+
+(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "Ou48Q~1vuDW.9TXLpTVgYrx~_C1ZptcAck59ta53", "<client secret>"} | Set-Content -Path "$path\appsettings.json"
+
+(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "c5f6469b-a484-46c3-a676-8a3b33b7e33d", "$PBID"} | Set-Content -Path "$path\appsettings.json"
+
+(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "fad26f53-114b-4613-9459-b751124c8fe5", "$reportid"} | Set-Content -Path "$path\appsettings.json"
+
+(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "f82722f4-a92c-4612-9c3f-1ab21aa1a308", "$datasetid"} | Set-Content -Path "$path\appsettings.json"
+
+sleep 5
+
 Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
 
 Stop-Transcript
