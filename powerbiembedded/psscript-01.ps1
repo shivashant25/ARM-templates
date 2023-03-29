@@ -127,6 +127,11 @@ $path = "C:\Users\hacker1\Desktop\hacker\Power BI Embedded workshop_latest"
 
 sleep 5
 
+$path = "C:\Users\hacker1\Desktop\hacker\Power BI Embedded workshop_latest\wwwroot\js"
+(Get-Content -Path "$path\index.js") | ForEach-Object {$_ -Replace "6f22f059-088b-40ca-9adf-f285dc9ff2bb", "$datasetid"} | Set-Content -Path "$path\index.js"
+
+sleep 5
+
 Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
 
 Stop-Transcript
