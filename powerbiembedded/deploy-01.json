@@ -302,7 +302,7 @@
         },
         "storageProfile": {
           "imageReference": {
-            "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/SQLExtensionPowerBIDemo/images/hackervm-def/versions/0.0.1"
+            "id": "/subscriptions/269ad598-b69b-4ce2-a696-8217033b1690/resourceGroups/cloudlabs-mgmt/providers/Microsoft.Compute/galleries/SQLExtensionPowerBIDemo/images/hackervm-def/versions/0.0.2"
           },
           "osDisk": {
             "createOption": "fromImage",
