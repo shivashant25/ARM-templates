@@ -86,10 +86,6 @@ sleep 5
 
 $SPobjectID = $servicePrincipal.Id
 
-Get-AzureADGroup -ObjectID 7de766d3-56cd-4945-8d5d-07bc2e3af5e5
-
-Add-AzureADGroupMember -ObjectId 7de766d3-56cd-4945-8d5d-07bc2e3af5e5 -RefObjectId $SPobjectID
-sleep 5
 
 $userName = "powerbiembeddedlab@cloudevents.ai"
 $password = "Admin@powerbi" | ConvertTo-SecureString -AsPlainText -Force
@@ -98,13 +94,35 @@ $cred = New-Object -TypeName PSCredential -ArgumentList $userName, $password
 
 $tenantid = "0b9d902d-e3c1-48f1-8979-365832b339dd"
 
-Connect-AzureAD -TenantId $tenantid -Credential $cred 
+Connect-AzureAD -TenantId $tenantid -Credential $cred
+
+
+Get-AzureADGroup -ObjectID 7de766d3-56cd-4945-8d5d-07bc2e3af5e5
+
+Add-AzureADGroupMember -ObjectId 7de766d3-56cd-4945-8d5d-07bc2e3af5e5 -RefObjectId $SPobjectID
+
+sleep 5 
 
 $userid = (Get-AzADUser -DisplayName "ODL_User $DeploymentID").Id
 
 Get-AzureADDirectoryRole -ObjectId 19182b4e-77ae-49fe-9f99-cdfd9d449c21
 
 Add-AzureADDirectoryRoleMember -ObjectId 19182b4e-77ae-49fe-9f99-cdfd9d449c21 -RefObjectId $userid
+
+sleep 5
+
+#Az login
+. C:\LabFiles\AzureCreds.ps1
+
+$userName = $AzureUserName
+$password = $AzurePassword
+$subscriptionId = $AzureSubscriptionID
+$TenantID = $AzureTenantID
+
+$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
+$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
+
+Connect-PowerBIServiceAccount -Credential $cred | Out-Null
 
 #check Power BI Workspace creation
 $validatereport = Get-PowerBIReport -Name 'Wingtip Sales Analysis' -WorkspaceId $PBID
