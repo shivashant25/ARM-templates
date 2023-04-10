@@ -161,6 +161,8 @@ else {
 #Start the cloudlabs agent service 
 CloudlabsManualAgent Start     
 
+Remove-Item -Path "C:\Packages\logontask.ps1"  
+
 sleep 5
 Unregister-ScheduledTask -TaskName "logontask" -Confirm:$false 
 Restart-Computer -Force 
