@@ -22,6 +22,8 @@ Connect-PowerBIServiceAccount -Credential $cred | Out-Null
 
 New-PowerBIWorkspace -Name "hacker$DeploymentID"
 
+sleep 5
+
 cd C:\LabFiles
 
 $PBID = (Get-PowerBIWorkspace).Id
@@ -74,8 +76,6 @@ $tenantid = "0b9d902d-e3c1-48f1-8979-365832b339dd"
 
 Connect-AzAccount -TenantId $tenantid -Credential $cred 
 
-$userid = (Get-AzADUser -DisplayName "ODL_User $DeploymentID").Id
-
 $deploymentid = "$DeploymentID"
 
 #get Service Principal details
@@ -99,6 +99,8 @@ $cred = New-Object -TypeName PSCredential -ArgumentList $userName, $password
 $tenantid = "0b9d902d-e3c1-48f1-8979-365832b339dd"
 
 Connect-AzureAD -TenantId $tenantid -Credential $cred 
+
+$userid = (Get-AzADUser -DisplayName "ODL_User $DeploymentID").Id
 
 Get-AzureADDirectoryRole -ObjectId 19182b4e-77ae-49fe-9f99-cdfd9d449c21
 
@@ -140,10 +142,6 @@ else {
 
 #Start the cloudlabs agent service 
 CloudlabsManualAgent Start     
-
-sleep 5
-Unregister-ScheduledTask -TaskName "logontask" -Confirm:$false 
-Restart-Computer -Force 
 
 sleep 5
 Unregister-ScheduledTask -TaskName "logontask" -Confirm:$false 
