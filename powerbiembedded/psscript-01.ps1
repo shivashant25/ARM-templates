@@ -90,7 +90,7 @@ cd C:\LabFiles
 #Download Logon-task file
 
 $WebClient = New-Object System.Net.WebClient
-$WebClient.DownloadFile("https://github.com/shivashant25/ARM-templates/blob/main/powerbiembedded/logontask.ps1","C:\Packages\logontask.ps1")
+$WebClient.DownloadFile("https://raw.githubusercontent.com/shivashant25/ARM-templates/main/powerbiembedded/logontask.ps1","C:\Packages\logontask.ps1")
 
 sleep 5
 
