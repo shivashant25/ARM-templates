@@ -39,9 +39,13 @@ $path=$path.Path
 $commonscriptpath = "$path" + "\cloudlabs-common\cloudlabs-windows-functions.ps1"
 . $commonscriptpath
 
+#Use the commonfunction to install the required files for cloudlabsagent service 
+CloudlabsManualAgent Install
+
 # Run Imported functions from cloudlabs-windows-functions.ps1
 WindowsServerCommon
 CreateCredFile $AzureUserName $AzurePassword $AzureTenantID $AzureSubscriptionID $DeploymentID $azuserobjectid
+InstallModernVmValidator
 InstallChocolatey
 
 sleep 10
@@ -59,6 +63,20 @@ Install-Module -Name MicrosoftPowerBIMgmt -Force
 
 sleep 5
 
+Install-Module AzureAD -Force -AllowClobber
+
+sleep 5
+
+Import-Module AzureAD -Force
+
+sleep 5
+
+Install-WindowsFeature RSAT-AD-PowerShell
+
+sleep 5
+
+Import-Module ActiveDirectory
+
 #Download PBI reports
 
 cd C:\LabFiles
@@ -69,65 +87,33 @@ cd C:\LabFiles
 
 (New-Object Net.WebClient).DownloadFile("https://pbiembeddedlabfiles23.blob.core.windows.net/pbi-report/Sales & Returns Sample with RLS.pbix", "C:\LabFiles\Sales & Returns Sample with RLS.pbix")
 
-#Az login
-. C:\LabFiles\AzureCreds.ps1
+#Download Logon-task file
 
-$userName = $AzureUserName
-$password = $AzurePassword
-$subscriptionId = $AzureSubscriptionID
-$TenantID = $AzureTenantID
-
-$securePassword = $password | ConvertTo-SecureString -AsPlainText -Force
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $userName, $SecurePassword
-
-Connect-PowerBIServiceAccount -Credential $cred | Out-Null
-
-New-PowerBIWorkspace -Name "hacker$DeploymentID"
-
-cd C:\LabFiles
-
-$PBID = (Get-PowerBIWorkspace).Id
-
-New-PowerBIReport -Path 'C:\LabFiles\Wingtip Sales Analysis.pbix' -Name 'Wingtip Sales Analysis' -WorkspaceId $PBID
-
-sleep 5
-
-$salesreport = Get-PowerBIReport -Name 'Wingtip Sales Analysis' -WorkspaceId $PBID
-
-sleep 5
-
-$reportid = $salesreport.Id
-
-$datasetid = $salesreport.DatasetId
-
-cd C:\LabFiles
-
-New-Item C:\LabFiles\workspacedetails.txt
-
-Add-Content C:\LabFiles\workspacedetails.txt "workspaceID= $PBID"
-
-Add-Content C:\LabFiles\workspacedetails.txt "reportID= $reportid"
-
-Add-Content C:\LabFiles\workspacedetails.txt "datasetID= $datasetid"
-
-sleep 5
-
-$path = "C:\Users\hacker1\Desktop\hacker\Power BI Embedded workshop_latest"
-
-(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "c5f6469b-a484-46c3-a676-8a3b33b7e33d", "$PBID"} | Set-Content -Path "$path\appsettings.json"
-
-(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "fad26f53-114b-4613-9459-b751124c8fe5", "$reportid"} | Set-Content -Path "$path\appsettings.json"
-
-(Get-Content -Path "$path\appsettings.json") | ForEach-Object {$_ -Replace "f82722f4-a92c-4612-9c3f-1ab21aa1a308", "$datasetid"} | Set-Content -Path "$path\appsettings.json"
-
-sleep 5
-
-$path = "C:\Users\hacker1\Desktop\hacker\Power BI Embedded workshop_latest\wwwroot\js"
-(Get-Content -Path "$path\index.js") | ForEach-Object {$_ -Replace "6f22f059-088b-40ca-9adf-f285dc9ff2bb", "$datasetid"} | Set-Content -Path "$path\index.js"
+$WebClient = New-Object System.Net.WebClient
+$WebClient.DownloadFile("https://github.com/shivashant25/ARM-templates/blob/main/powerbiembedded/logontask.ps1","C:\Packages\logontask.ps1")
 
 sleep 5
 
 Enable-CloudLabsEmbeddedShadow $vmAdminUsername $trainerUserName $trainerUserPassword
+
+#Enable Autologon
+$AutoLogonRegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoAdminLogon" -Value "1" -type String 
+Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultUsername" -Value "$($env:ComputerName)\demouser" -type String  
+Set-ItemProperty -Path $AutoLogonRegPath -Name "DefaultPassword" -Value "$vmAdminPassword" -type String
+Set-ItemProperty -Path $AutoLogonRegPath -Name "AutoLogonCount" -Value "1" -type DWord
+
+
+# Scheduled Task to Run PostConfig.ps1 screen on logon
+$Trigger= New-ScheduledTaskTrigger -AtLogOn
+$User= "$($env:ComputerName)\$adminUsername" 
+$Action= New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\Powershell.exe" -Argument "-executionPolicy Unrestricted -File C:\Packages\logontask.ps1"
+Register-ScheduledTask -TaskName "logontask" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force
+
+#Use the cloudlabs common function to write the status to validation status txt file 
+$Validstatus="Pending"  ##Failed or Successful at the last step
+$Validmessage="Post Deployment is Pending"
+CloudlabsManualAgent setStatus
 
 Stop-Transcript
 Restart-Computer -Force 
